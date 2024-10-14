@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>JavaScript Dates</h1>
+<h2>Using new Date()</h2>
+
+
+<script>
+  const fecha = new Date();
+
+const opciones = {
+    weekday: 'long',   // Lunes, Martes, etc.
+    year: 'numeric',   // 2024
+    month: 'long',     // Octubre
+    day: 'numeric',    // 13
+    hour: '2-digit',   // 04
+    minute: '2-digit', // 30
+    second: '2-digit', // 45
+    hour12: true,      // Formato 12 horas
+    timeZone: 'Europe/London', // Especifica la zona horaria "Europe/Madrid"
+    timeZoneName: 'short'         // Abreviatura de la zona horaria (EDT)
+};
+
+const formateador = new Intl.DateTimeFormat('es-ES', opciones);
+console.log(formateador.format(fecha)); // Ejemplo: domingo, 13 de octubre de 2024, 04:30:45 EDT
+
+
+/*
+Opciones de Intl.DateTimeFormat
+1. year: Define cómo mostrar el año.
+"numeric": Muestra el año completo, por ejemplo, 2024.
+"2-digit": Muestra solo los últimos dos dígitos, por ejemplo, 24.
+
+2. month: Define cómo mostrar el mes.
+"numeric": Muestra el mes en formato numérico, por ejemplo, 10 (para octubre).
+"2-digit": Muestra el mes en formato numérico con dos dígitos, por ejemplo, 10 (para octubre).
+"long": Muestra el nombre completo del mes, por ejemplo, October o Octubre.
+"short": Muestra una versión abreviada del mes, por ejemplo, Oct.
+"narrow": Muestra el mes con la menor cantidad de caracteres posible, como O (depende del idioma y el contexto).
+
+3. day: Define cómo mostrar el día del mes.
+"numeric": Muestra el día en formato numérico, por ejemplo, 13.
+"2-digit": Muestra el día en formato numérico con dos dígitos, por ejemplo, 13.
+
+4. weekday: Define cómo mostrar el día de la semana.
+"long": Muestra el nombre completo del día, por ejemplo, Sunday o Domingo.
+"short": Muestra una versión abreviada del día, por ejemplo, Sun o Dom.
+"narrow": Muestra una representación mínima del día, como S.
+
+5. hour: Define cómo mostrar la hora.
+"numeric": Muestra la hora en formato numérico, por ejemplo, 16 (para 4 PM en formato de 24 horas).
+"2-digit": Muestra la hora con dos dígitos, por ejemplo, 04 o 16.
+
+6. minute: Define cómo mostrar los minutos.
+"numeric": Muestra los minutos en formato numérico, por ejemplo, 30.
+"2-digit": Muestra los minutos en formato de dos dígitos, por ejemplo, 30.
+
+7. second: Define cómo mostrar los segundos.
+"numeric": Muestra los segundos en formato numérico, por ejemplo, 45.
+"2-digit": Muestra los segundos en formato de dos dígitos, por ejemplo, 45.
+
+8. hour12: Define si se usa el formato de 12 horas o de 24 horas.
+true: Usa el formato de 12 horas, por ejemplo, 4 PM.
+false: Usa el formato de 24 horas, por ejemplo, 16:00.
+
+9. timeZone: Especifica la zona horaria a usar.
+Por ejemplo, "UTC", "America/New_York", "Europe/Madrid". Si no se especifica, usa la zona horaria local.
+
+10. timeZoneName: Controla cómo mostrar la zona horaria.
+"short": Muestra una versión abreviada de la zona horaria, como GMT o PST.
+"long": Muestra el nombre completo de la zona horaria, como Greenwich Mean Time o Pacific Standard Time.
+
+
+
+*/
+
+
+
+
+
+ 
+</script>
+
+</body>
+</html>

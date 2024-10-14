@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>JavaScript Dates</h1>
+<h2>Using new Date()</h2>
+
+
+<script>
+    let fecha = new Date(); // Fecha actual
+
+// Obtener partes de la fecha
+const dia = fecha.getDate();// Día de la semana (0 = domingo, 6 = sábado): 0
+const mes = fecha.getMonth() + 1; // Los meses comienzan desde 0 (enero es 0)
+const año = fecha.getFullYear();
+
+// Formatear en formato "DD/MM/YYYY"
+let fechaFormateada = `${dia}/${mes}/${año}`;
+
+alert(fechaFormateada);
+//---------------------------------
+
+// Formato según configuración regional (en este caso, español de España)
+ fechaFormateada = fecha.toLocaleDateString('es-ES');
+ alert(fechaFormateada); // Ejemplo de salida: 13/10/2024
+
+
+ 
+</script>
+
+</body>
+</html>

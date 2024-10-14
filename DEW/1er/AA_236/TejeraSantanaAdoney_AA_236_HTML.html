@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+<script>
+
+
+let fechaPrompt = prompt("Fecha de nacimiento")
+let fecha = new Date(fechaPrompt)
+
+if (isNaN(fecha.getDate())) {
+    alert("La fecha introducida no es valida")
+
+} else {
+    let fechaActual = new Date()
+
+    let diferenciaMS = fechaActual - fecha
+
+    let diferencia = new Date(diferenciaMS)
+
+    console.log(diferencia.getDate())
+
+}
+
+
+</script>
+
+</body>
+</html>

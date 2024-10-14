@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript">
+        
+      /*  let define una variable local limitando su alcance al bloque de ejecución, expresión o declaración en la que se encuentre. 
+        Es una característica no estándar por lo que puede dar problemas en diferentes navegadores.
+
+var define una variable limitando su ámbito a la función en la que se define o al ámbito global
+ (si no se encuentra dentro de una función), 
+ independientemente del bloque de ejecución en el que se ejecute.*/
+        let variable_let_out =2;
+        {
+        var variable_var = 'valor variable var';
+        let variable_let = 'valor variable let';
+       
+        console.log('var dentro de bloque: ' + variable_var);
+        console.log('let dentro de bloque: ' + variable_let);
+        }
+
+        console.log('var fuera de bloque: ' + variable_var);
+
+        console.log('let variable_let_out fuera de bloque: ' + variable_let_out);
+
+        console.log('let fuera de bloque: ' + variable_let);
+
+        // NO deja repetir varibale 
+        //let variable_let_out =2;
+        var variable_var = 'valor variable var';
+
+    </script>
+</head>
+<body>
+
+
+</body>
+</html>

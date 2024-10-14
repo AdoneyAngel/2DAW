@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>230</title>
+</head>
+<body>
+    <script>
+        var velocidad = 50
+        let limiteVelocidad = 240
+        let modoAlerta = false
+
+        if (velocidad >= limiteVelocidad) {
+            alert("Velocidad excedida")
+        }
+
+        if (modoAlerta && velocidad > 100) {
+            alert("Velocidad muy peligrosa")
+        } 
+
+        switch (true) {
+            case velocidad < 50:
+                alert("Baja velocidad")
+                break
+
+            case velocidad >= 50 && velocidad < 80:
+                alert("Velocidad moderada")
+                break
+
+            case velocidad >= 80 && velocidad < 120:
+                alert("Alta velocidad")
+                break
+
+            case velocidad >= 120:
+                alert("Velocidad extremadamente alta")
+                break
+        }
+    </script>
+</body>
+</html>

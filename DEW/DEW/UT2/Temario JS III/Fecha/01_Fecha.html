@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>JavaScript Dates</h1>
+<h2>Using new Date()</h2>
+
+
+<script>
+    let d = new Date();
+    alert(d);    
+    d= new Date("2022-03-25");
+    alert(d);
+
+    d=new Date("Octubre 13, 2024 10:10:00");
+    alert(d);
+
+    let year=2024
+    let month=10
+    let day =1;
+    let hours=12;
+    let minutes=11;
+    let seconds=30;
+    let ms =100;
+
+    d=  new Date(year,month);
+    alert(d);
+
+    d= new Date(year,month,day);
+    alert(d);
+
+    d= new Date(year,month,day,hours);
+    alert(d);
+
+    d= new Date(year,month,day,hours,minutes);
+    alert(d);
+
+    d= new Date(year,month,day,hours,minutes,seconds);
+    alert(d);
+
+    d= new Date(year,month,day,hours,minutes,seconds,ms);
+    alert(d);
+
+</script>
+
+</body>
+</html>

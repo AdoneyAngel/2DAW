@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio con date-fns usando CDN</title>
+    <!-- Incluir date-fns desde un CDN -->
+
+    <!-- https://date-fns.org/v4.1.0/docs/CDN -->
+     
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/locale/es/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/locale/ru/cdn.min.js"></script>
+
+</head>
+<body>
+    <h1>Ejercicio con date-fns usando CDN</h1>
+    <p>Abre la consola para ver los resultados.</p>
+    <script>
+        // Definición de las fechas
+        const fechaInicio = new Date('2024-01-01');
+        const fechaFin = new Date('2024-12-31');
+
+        // Calcular la cantidad de días entre las dos fechas
+        const cantidadDias = dateFns.differenceInDays(fechaFin, fechaInicio);
+
+        // Calcular la fecha que resulta de agregar 30 días a la fecha de inicio
+        const nuevaFecha = dateFns.addDays(fechaInicio, 30);
+
+        // Obtener el día de la semana de la fecha de fin
+        const diaDeLaSemanaFin = dateFns.format(fechaFin, 'EEEE'); // Formato para obtener el nombre del día de la semana
+        console.log(format(fechaFin, 'E'));    // Resultado: 1 (si es lunes)
+        console.log(format(fechaFin, 'EE'));   // Resultado: 01 (si es lunes)
+        console.log(format(fechaFin, 'EEE'));  // Resultado: "Lun"
+        console.log(format(fechaFin, 'EEEE')); // Resultado: "Lunes"
+
+        // Mostrar resultados
+        console.log(`La cantidad de días entre ${fechaInicio.toDateString()} y ${fechaFin.toDateString()} es ${cantidadDias} días.`);
+        console.log(`La fecha que resulta de agregar 30 días a la fecha de inicio (${fechaInicio.toDateString()}) es ${nuevaFecha.toDateString()}.`);
+        console.log(`El día de la semana de la fecha de fin (${fechaFin.toDateString()}) es ${diaDeLaSemanaFin}.`);
+    </script>
+</body>
+</html>

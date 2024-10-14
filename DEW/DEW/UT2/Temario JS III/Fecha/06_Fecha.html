@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>JavaScript Dates</h1>
+<h2>Using new Date()</h2>
+
+
+<script>
+ 
+ const fecha1 = new Date(2024, 9, 13); // 13 de octubre de 2024
+const fecha2 = new Date(2025, 9, 13); // 13 de octubre de 2025
+
+// Comparar fechas
+if (fecha1.getTime() < fecha2.getTime()) {
+    console.log('fecha1 es anterior a fecha2');
+} else if (fecha1.getTime() > fecha2.getTime()) {
+    console.log('fecha1 es posterior a fecha2');
+} else {
+    console.log('Las fechas son iguales');
+}
+</script>
+
+</body>
+</html>

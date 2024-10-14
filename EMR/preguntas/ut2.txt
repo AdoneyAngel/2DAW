@@ -1,0 +1,15 @@
+¿De qué está formado el microentornos?
+-[Correcto]Formado por los factores y variables sobre que la empresa puede intervenir de algún modo.
+-Factores y variables sobre los que la empresa no puede tener control.
+-Entorno minúsculo
+
+¿De que está formado el macroentorno?
+-Formado por los factores y variables sobre que la empresa puede intervenir de algún modo.
+-[Correcto]Factores y variables sobre los que la empresa no puede tener control.
+-Entorno a gran escala.
+
+¿Qué es un modelo de negocio?
+-Un modelo de negocio es solo la forma en que una empresa maximiza sus beneficios sin preocuparse por los clientes.
+-Un modelo de negocio se refiere exclusivamente a la estructura organizativa de una empresa y no a la creación de valor para los clientes.
+-[Correcto]Un modelo de negocio es solo la forma en que una empresa maximiza sus beneficios sin preocuparse por los clientes.
+

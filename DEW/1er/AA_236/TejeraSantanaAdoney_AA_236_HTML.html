@@ -13,17 +13,31 @@
 let fechaPrompt = prompt("Fecha de nacimiento")
 let fecha = new Date(fechaPrompt)
 
-if (isNaN(fecha.getDate())) {
+if (isNaN(fecha.getTime())) {
     alert("La fecha introducida no es valida")
 
 } else {
+
     let fechaActual = new Date()
+
+    let proximoCumple = new Date(fecha)
+    proximoCumple.setFullYear(fechaActual.getFullYear()+1)
 
     let diferenciaMS = fechaActual - fecha
 
-    let diferencia = new Date(diferenciaMS)
+    let diferenciaDia = (new Date(diferenciaMS)) / (1000*60*60*24)
+    let diferenciaMes = (new Date(diferenciaMS)) / (1000*60*60*24*30)
+    let diferenciaAños = (new Date(diferenciaMS)) / (1000*60*60*24*30*12)
+    let diasProximoCumple = (proximoCumple-fechaActual) / (1000*60*60*24)
 
-    console.log(diferencia.getDate())
+    //Se quitan los decimales
+    diferenciaDia = Math.floor(diferenciaDia)
+    diferenciaMes = Math.floor(diferenciaMes)
+    diferenciaAños = Math.floor(diferenciaAños)
+    diasProximoCumple = Math.floor(diasProximoCumple)
+
+
+    document.write("Años: " + diferenciaAños + ", Meses: " + diferenciaMes + ", Dias: " + diferenciaDia + "<br>" + "Días para próximo cumple: " + diasProximoCumple)
 
 }
 

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+
+        let fechaPrompt = prompt("Fecha de entrega")
+        let notaPrompt = prompt("Nota obtenida")
+
+        let fecha = new Date(fechaPrompt)
+        let fechaActual = new Date()
+
+        if (isNaN(fecha.getTime())) {
+            alert("La fecha introducida no es válida")
+
+        }else if (isNaN(notaPrompt)) {
+            alert("La nota introducida no es válida")
+
+        } else {
+            if (fecha > fechaActual) {
+                notaPrompt = Number(notaPrompt)+10
+            }
+
+            if (notaPrompt < 60) {
+                alert("Su nota final es: " + notaPrompt + ", por lo que has suspendido")
+
+            } else {
+                alert("Su nota final es: " + notaPrompt + ", has aprobado")
+            }
+        }
+
+    </script>
+</body>
+</html>

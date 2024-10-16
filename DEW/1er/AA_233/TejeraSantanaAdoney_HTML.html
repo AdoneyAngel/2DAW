@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Ventas</title>
+</head>
+<body>
+    <canvas id="grafica"></canvas>
+    <script>
+        const grafica = document.getElementById("grafica")
+
+        const chart = new Chart(grafica, {
+            type: "bar",
+            data: {
+                labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto"],
+                datasets: [
+                    {
+                        label: "Ventas (en miles)",
+                        data: [12, 19, 3, 5, 2, 3, 10, 15],
+                        backgroundColor: "#ffbd8e",
+                        borderColor: "#cc8553",
+                        borderWidth: 2,
+                        type: "bar"                  
+                    }
+                ]
+
+            }
+        })
+    </script>
+</body>
+</html>

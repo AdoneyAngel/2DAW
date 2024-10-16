@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+
+        var edad = prompt("Edad del representado")
+        let id = prompt("ID del representante")
+        let tieneID = false
+
+        if (isNaN(id)) {
+            tieneID = false
+
+        } else {
+            tieneID = true
+        }
+
+        if (isNaN(edad) || edad <= 0) {
+            alert("Edad inválida, se mostrará un error por consola")
+            throw new Error("Edad inválida");
+
+        } else {
+            let puedeComprar = tieneID && edad >= 18
+
+            if (puedeComprar) {
+                alert("Compra permitida")
+
+            } else {
+                alert("Compra denegada")
+            }
+
+            switch(true) {
+                case edad<18:
+                    alert("Edad insuficiente para comprar alcohol")
+                    break
+                
+                case edad<21&&edad>=18:
+                    alert("Compra permitida, pero con restricciones")
+                    break
+
+                default:
+                    alert("Compra completamente permitida")
+                    break
+            }
+        }
+        
+
+
+    </script>
+</body>
+</html>

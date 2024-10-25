@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <canvas id="grafica"></canvas>
+    
+    <script>
+
+
+        //Edad debe ser >=18 y <64
+
+        //Datos
+        // let fechaInicioPrestamoPrompt = prompt("Fecha de inicio del préstamo (YY-MM-DD)")
+        // let totalPrestamo = prompt("Monto total del préstamo")
+        // let tasaInteres = prompt("Tasa de interés anual (en porcentaje)")
+        // let numeroMeses = prompt("Número de meses para el plazo del préstamo")
+        // let pagosMensuales = prompt("Pagos mensuales (Si no se ingresa nada se calculará automáticamente)")
+        // let fechaNacimientoPrompt = prompt("Fecha de nacimiento")
+
+        //Valores preestablecidos
+        let fechaInicioPrestamoPrompt = "2024-10-23"
+        let totalPrestamo = "1000"
+        let tasaInteres = "5"
+        let numeroMeses = "1000"
+        let pagosMensuales = ""
+        let fechaNacimientoPrompt = "2005-5-14"
+
+        let datosValidos = true
+        let mensajeErr = ""
+
+        let fechaNacimiento
+        let fechaInicio
+        let cantidadAdicionalMensual = 0
+
+        //Validar los datos
+        if (!fechaInicioPrestamoPrompt || !fechaInicioPrestamoPrompt.length || !totalPrestamo || !totalPrestamo.length || !tasaInteres || !tasaInteres.length || !numeroMeses || !numeroMeses.length || !fechaNacimientoPrompt || !fechaNacimientoPrompt.length) {
+            datosValidos = false
+            mensajeErr = "No pueden haber campos vacíos"
+
+        } else {
+            fechaNacimiento = new Date(fechaNacimientoPrompt)
+            fechaInicio = new Date(fechaInicioPrestamoPrompt)
+
+            if (isNaN(fechaNacimiento.getTime())) {
+                datosValidos = false
+                mensajeErr = "Fecha de nacimiento inválido"
+            }
+
+            if (isNaN(fechaInicio.getTime())) {
+                datosValidos = false
+                mensajeErr = "Fecha de inicio del préstamo inválido"
+            }
+            if (isNaN(Number(totalPrestamo))) {
+                datosValidos = false
+                mensajeErr = "Total del préstamo inválido"
+            }
+            if (isNaN(Number(tasaInteres))) {
+                datosValidos = false
+                mensajeErr = "Tasa de interés inválido"
+            }
+            if (isNaN(Number(numeroMeses))) {
+                datosValidos = false
+                mensajeErr = "Número de meses inválido"
+            }
+            if (pagosMensuales && pagosMensuales.length) {
+                if (isNaN(Number(pagosMensuales))) {
+                    datosValidos = false
+                    mensajeErr = "El número de pagos mensuales es inválido"
+                }
+            }
+        }
+
+        //Validar si es mayor de 18 y menor de 64
+        let edad = ((new Date())-fechaNacimiento)/(1000*60*60*24*365)
+
+        if (edad <=18 || edad>64) {
+            datosValidos = false
+            mensajeErr = "No cumple con la edad necesaria para realizar el préstamo"
+        }
+
+        //Cálculos
+        if (datosValidos) {//Se continuará a los cálculos si los datos son válidos
+            //Calcular fecha finalización 
+            let fechaFinalizacion = new Date(fechaInicioPrestamoPrompt)
+            fechaFinalizacion.setMonth(fechaFinalizacion.getMonth()+Number(numeroMeses))
+
+            //Se obtiene la edad del cliente en la fecha de finalización
+            let edadFinal = (fechaFinalizacion-(fechaNacimiento))/(1000*60*60*24*365)
+
+            if (edadFinal < 65) {
+                //Se calcula la tasa de interes a mensual
+                tasaInteres *= .100
+                tasaInteres /= 12
+
+                //Calcular pagos mensuales
+                if (!pagosMensuales.length) {
+                    pagosMensuales = (totalPrestamo * tasaInteres) / (1 - Math.pow((1 + tasaInteres), -numeroMeses));
+                }
+
+                let totalPago = pagosMensuales*numeroMeses
+                let totalInteresPagado = (totalPago-totalPrestamo)
+                cantidadAdicionalMensual = totalInteresPagado/Number(numeroMeses)
+
+                //Se almacena cada cantidad restante en un array (para utilizarlo luego con la gráfica)
+                let pagosRestantes = []
+
+                //Mostrar el saldo pendiente por cada pago
+                document.write("<h2>Pagos mensuales:</h2> <br>")
+                let cantidadPagada = 0
+                for (let mes = 1; mes<=numeroMeses; mes++) {
+                    const cantidadRestante = (totalPago-cantidadPagada)
+                    document.write("Mes nº" + mes + ", cantidad restante: <b>" + cantidadRestante + "</b> ("+cantidadAdicionalMensual+"€ en intereses)<br>")
+
+                    cantidadPagada += pagosMensuales
+
+                    pagosRestantes.push(cantidadRestante)
+                }
+
+                //Mostrar datos en consola
+                console.log("Fecha de finalización del pago: " + fechaFinalizacion)
+                console.log("Pago mensual: " + pagosMensuales + "€")
+                console.log("Total pagado: " + totalPago)
+                console.log("Intereses totales pagados: " + totalInteresPagado + "€")
+
+                //Crear gráfica
+                const graficaCanvas = document.getElementById("grafica")
+                let meses = []
+
+                //Se añade a "meses" todos los meses
+                for (let mes = 1;mes<=numeroMeses;mes++) {
+                    meses.push(mes)
+                }
+
+                const datosGrafica = new Chart(graficaCanvas, {
+                    type: "bar",
+                    data: {
+                        labels: meses,
+                        datasets: [
+                            {
+                                label: "Dinero faltante",
+                                data: pagosRestantes,
+                                backgroundColor: "#ffbd8e",
+                                borderColor: "#cc8553",
+                                borderWidth: 2,
+                                type: "bar"                  
+                            }
+                        ]
+
+                    }
+                })
+
+            } else {
+                alert("En la fecha de finalización, el cliente estará jubilado, no se podrá hacer el préstamo")
+            }
+             
+        } else {
+            alert(mensajeErr)
+        }
+
+    </script>
+
+</body>
+</html>

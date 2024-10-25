@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <script>
+
+        //variables
+        const nombre = prompt("Nombre de usuario")
+        const nacimientoPrompt = prompt("Fecha de nacimiento (YY/MM/DD)")
+        const precio = prompt("Precio")
+        const fechaActual = new Date()
+        const saldo = 100
+
+        //Se comprueba que los campos no están vacios
+        if (nombre.length && nacimientoPrompt.length && precio.length) {
+            const nacimiento = new Date(nacimientoPrompt)
+
+            //Se comprueba si ha introducido una fecha de nacimiento válido
+            if (!isNaN(nacimiento.getTime())) {
+
+                //Se comprueba que el precio es válido
+                if (!isNaN(Number(precio))) {
+                    const diferenciaFechas = fechaActual-nacimiento
+                    const edad = diferenciaFechas/(1000*60*60*24*365)
+                    
+                    //Se valida el precio dependiendo de su edad
+                    const precioFinal = edad<18 ? precio*.9 : precio
+
+                    //Se le notifica del descuento si es menor
+                    if(edad<18) alert("Por ser menor de edad se le aplicará un descuento")
+
+                    //Se comprueba si puede comprar el producto con el saldo inicial
+                    if (precioFinal>saldo) {
+                        const tieneAval = confirm("Su saldo es insuficiente para comprar el producto, ¿dispone de AVAL para financiarlo?")
+
+                        //Se comprueba si tiene AVAL
+                        if (tieneAval) {
+                            alert("Perfecto, se le podrá financiar el resto del precio: " + Math.abs(saldo-precioFinal) + "€")
+
+                        } else {
+                            alert("No se va a poder efectuar la compra por falta de saldo")
+                        }
+
+                    } else {
+                        alert("Compra del producto realizado, saldo restante: " + (saldo-precioFinal) + "€")
+                    }
+
+                } else {
+                    alert("Precio inválido")
+                }
+
+            } else {
+                alert("Fecha de nacimiento inválido")
+            }
+            
+        } else {
+            alert("No pueden haber campos vacíos")
+        }
+
+
+    </script>
+
+</body>
+</html>

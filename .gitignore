@@ -1,8 +1,2 @@
 #Maquinas virtuales
 *.vid
-
-#Frameworks
-#--node
-node_modules/
-#--Laravel
-vector/

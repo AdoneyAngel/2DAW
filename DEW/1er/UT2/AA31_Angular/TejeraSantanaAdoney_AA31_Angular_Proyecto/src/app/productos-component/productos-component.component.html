@@ -1,0 +1,34 @@
+<p>productos-component works!</p>
+<form action="">
+
+<select (change)="seleccionarCategoria()" [(ngModel)]="categoriaSeleccionada" name="categoria" id="">
+  @for (categoria of listaCategoriaS; track $index) {
+    <option value="{{categoria.nombre}}">{{ categoria.nombre }}</option>
+  }
+</select>
+
+<br>
+
+<select [(ngModel)]="productoSeleccionado" *ngIf="productosCategoria" name="producto" id="">
+  @for (producto of productosCategoria; track $index) {
+    <option value="{{producto}}">{{producto}}</option>
+  }
+</select>
+
+<br>
+
+<button (click)="enviarProducto()">Enviar</button>
+
+<br><br>
+
+<div *ngIf="enviado">
+  <h2>Resultado</h2>
+  <ul>
+    <li>Categoria seleccionada: {{categoriaSeleccionada}}</li>
+    <li>Producto seleccionado: {{productoSeleccionado}}</li>
+  </ul>
+</div>
+
+
+
+</form>

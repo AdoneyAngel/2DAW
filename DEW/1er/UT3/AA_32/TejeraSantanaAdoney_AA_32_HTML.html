@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA_32</title>
+</head>
+<body>
+    <script>
+
+        /*
+        
+        La lista de productos se encuentra en la variable "productos"
+
+        Todos los filtros aplicados estan en variables como "filtroPrecio, filtroPalabra..."
+
+        Listas ordenadas ("productoOrdenadoPrecio", "productoOrdenadoCantidad")
+
+        Los productos en formato JSON están almacenados en al variable "listaJSON"
+        
+        */
+
+        const numeroProductos = 3
+        const productoNombres = ["Laptop", "Teléfono", "Tablet", "Monitor", "Auriculares"]
+
+        const maxPrecio = 1000
+        const minPrecio = 100
+        const maxCantidad = 100
+
+        let productos = []
+
+        //Generar productos
+
+        for(let productoI = 0; productoI<numeroProductos; productoI++) {
+            //Nombre
+            const nombre = productoNombres[Math.round((Math.random()*(productoNombres.length-1)))]
+
+            //Se genera la fecha
+            let fechaIngreso = new Date()
+            fechaIngreso.setDate(Number(fechaIngreso.getDate())+Math.random()*365)
+            
+            //Precio
+            const precio = Math.random()*(maxPrecio-minPrecio)+minPrecio
+
+            //Cantidad
+            const cantidad = Math.round(Math.random()*maxCantidad)
+
+            const nuevoProducto = {
+                id: productoI,
+                nombre,
+                fechaIngreso,
+                precio,
+                cantidad
+            }
+
+            productos.push(nuevoProducto)
+        }
+
+        //Filtrar productos
+
+        //----------------------Por rango precios
+        const filtroRangMax = 200
+        const filtroRangMin = 0
+
+        const filtroPrecios = productos.filter(productoActual => productoActual.precio <= filtroRangMax && productoActual.precio >= filtroRangMin)
+
+        //----------------------Por cantidad
+        const cantidadEspecifica = 50
+        const filtroCantidad = productos.filter(productoActual => productoActual.cantidad === cantidadEspecifica)
+
+        //----------------------Por palabra clave
+        const palabraClave = "Laptop"
+        const filtroPalabra = productos.filter(productoActual => productoActual.nombre === palabraClave)
+
+        //Ordenar productos
+
+        //----------------------Por precio (Ascendente)
+        let productoOrdenadoPrecio = [...productos]
+        productoOrdenadoPrecio = productoOrdenadoPrecio.sort((a, b) => (a.precio<b.precio)?-1:((a.precio>b.precio)?1:0))
+        
+        //----------------------Por cantidad (Ascendente)
+        let productoOrdenadoCantidad = [...productos]
+        productoOrdenadoCantidad = productoOrdenadoCantidad.sort((a, b) => (a.cantidad<b.cantidad)?-1:((a.cantidad>b.cantidad)?1:0))
+
+        //Convertir la lista en JSON
+        const listaJSON = JSON.stringify(productos)
+
+        //Mostrar productos
+        for (producto of productos) {
+            console.log("Id: "+producto.id+", Producto: "+producto.nombre+", Precio: "+producto.precio+"€, Cantidad: "+producto.cantidad+", Fecha de ingreso: "+producto.fechaIngreso)
+        }
+
+    </script>
+</body>
+</html>

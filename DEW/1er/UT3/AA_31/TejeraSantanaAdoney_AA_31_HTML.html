@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA_31</title>
+</head>
+<body>
+    <script>
+
+        /*
+        
+        La lista de eventos se encuentra en la variable "eventos"
+
+        Todos los filtros aplicados estan en variables como "filtroCateogria, filtroUbicacion..."
+
+        Los eventos en formato JSON están almacenados en al variable "listaJSON"
+        
+        */
+
+        const numeroEventos = 3
+        const eventoNombres = ["Conferencia", "Seminario", "Reunión", "Webinar", "Taller"]
+        const eventoCategorias = ["Negocios", "Tecnología", "Educación", "Entretenimiento"]
+        const eventoUbicaciones = ["Madrid", "Barcelona", "Valencia", "Sevilla"]
+
+        let eventos = []
+
+        //Generar eventos
+
+        for(let eventoI = 0; eventoI<numeroEventos; eventoI++) {
+            //Nombre
+            const nombre = eventoNombres[Math.round((Math.random()*(eventoNombres.length-1)))]
+
+            //Se genera la fecha
+            let fecha = new Date()
+            fecha.setDate(Number(fecha.getDate())+Math.random()*60)
+
+            //Categoria
+            const categoria = eventoCategorias[Math.round((Math.random()*(eventoCategorias.length-1)))]
+
+            //Ubicacion
+            const ubicacion = eventoUbicaciones[Math.round((Math.random()*(eventoUbicaciones.length-1)))]
+
+            //Asistentes
+            const asistentes = Math.round(Math.random()*200)
+
+            const nuevoEvento = {
+                nombre,
+                fecha,
+                categoria,
+                ubicacion,
+                asistentes
+            }
+
+            eventos.push(nuevoEvento)
+        }
+
+        //Filtrar eventos
+
+        //----------------------Por fecha
+        let fechaEspecífica = new Date()
+        fechaEspecífica.setDate(Number(fechaEspecífica.getDate())+10)
+
+        const filtroFecha = eventos.filter(eventoActual => eventoActual.fecha.getTime() === fechaEspecífica.getTime())
+
+        //----------------------Por categoria
+        const categoriaEspecifica = eventoCategorias[0]
+        const filtroCategoria = eventos.filter(eventoActual => eventoActual.categoria === categoriaEspecifica)
+
+        //----------------------Por ubicacion
+        const ubicacionEspecifica = eventoUbicaciones[0]
+        const filtroUbicacion = eventos.filter(eventoActual => eventoActual.ubicacion === ubicacionEspecifica)
+
+        //----------------------Por minimio de asistentes
+        const minimoAsistentes = 50
+        const filtroAsistentes = eventos.filter(eventoActual => eventoActual.asistentes >= minimoAsistentes)
+
+        //Convertir la lista en JSON
+        const listaJSON = JSON.stringify(eventos)
+
+        //Mostrar en consola
+        for(evento of eventos) {
+            console.log("Evento: "+evento.nombre+", Fecha: "+evento.fecha+", Ubicación: "+evento.ubicacion+", Asistentes: "+evento.asistentes)
+        }
+
+    </script>
+</body>
+</html>

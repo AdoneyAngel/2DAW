@@ -33,7 +33,8 @@
 
             //Se genera la fecha
             let fecha = new Date()
-            fecha.setDate(Number(fecha.getDate())+Math.random()*60)
+            fecha.setDate(Number(fecha.getDate())+Math.random()*2)
+            
 
             //Categoria
             const categoria = eventoCategorias[Math.round((Math.random()*(eventoCategorias.length-1)))]
@@ -58,25 +59,78 @@
         //Filtrar eventos
 
         //----------------------Por fecha
-        let fechaEspecífica = new Date()
-        fechaEspecífica.setDate(Number(fechaEspecífica.getDate())+10)
+        let fechaEspecífica = new Date("2024-11-6")
+        // let fechaEspecífica = new Date(prompt("Fecha a filtrar"))
 
-        const filtroFecha = eventos.filter(eventoActual => eventoActual.fecha.getTime() === fechaEspecífica.getTime())
+        if (isNaN(fechaEspecífica.getTime())) alert("Fecha inválida")
+
+        const filtroFecha = eventos.filter(eventoActual => eventoActual.fecha.getDate() === fechaEspecífica.getDate() && eventoActual.fecha.getMonth() === fechaEspecífica.getMonth() && eventoActual.fecha.getFullYear() === fechaEspecífica.getFullYear())
+
+        document.write("<h1>Filtro por fecha:"+fechaEspecífica+"</h1>")
+        for(evento of filtroFecha) {
+            document.write("<p>Nombre: "+evento.nombre+"</p>")
+            document.write("<p>Fecha: "+evento.fecha+"</p>")
+            document.write("<p>Categoria: "+evento.categoria+"</p>")
+            document.write("<p>Ubicación: "+evento.ubicacion+"</p>")
+            document.write("<p>Asistentes: "+evento.asistentes+"</p>")
+            document.write("<br>")
+        }
 
         //----------------------Por categoria
         const categoriaEspecifica = eventoCategorias[0]
+        // const categoriaEspecifica = prompt("Categoria a filtrar")
         const filtroCategoria = eventos.filter(eventoActual => eventoActual.categoria === categoriaEspecifica)
+        
+        if (!categoriaEspecifica || !categoriaEspecifica.length) alert("Categoría vacía")
+
+        document.write("<h1>Filtro por categoria:"+categoriaEspecifica+"</h1>")
+        for(evento of filtroCategoria) {
+            document.write("<p>Nombre: "+evento.nombre+"</p>")
+            document.write("<p>Fecha: "+evento.fecha+"</p>")
+            document.write("<p>Categoria: "+evento.categoria+"</p>")
+            document.write("<p>Ubicación: "+evento.ubicacion+"</p>")
+            document.write("<p>Asistentes: "+evento.asistentes+"</p>")
+            document.write("<br>")
+        }
 
         //----------------------Por ubicacion
         const ubicacionEspecifica = eventoUbicaciones[0]
+        // const ubicacionEspecifica = prompt("Ubicación a filtrar")
         const filtroUbicacion = eventos.filter(eventoActual => eventoActual.ubicacion === ubicacionEspecifica)
+
+        if (!ubicacionEspecifica || !ubicacionEspecifica.length) alert("Ubicación vacía")
+
+        document.write("<h1>Filtro por ubicación: "+ubicacionEspecifica+"</h1>")
+        for(evento of filtroUbicacion) {
+            document.write("<p>Nombre: "+evento.nombre+"</p>")
+            document.write("<p>Fecha: "+evento.fecha+"</p>")
+            document.write("<p>Categoria: "+evento.categoria+"</p>")
+            document.write("<p>Ubicación: "+evento.ubicacion+"</p>")
+            document.write("<p>Asistentes: "+evento.asistentes+"</p>")
+            document.write("<br>")
+        }
 
         //----------------------Por minimio de asistentes
         const minimoAsistentes = 50
+        // const minimoAsistentes = prompt("Mínimo de asistentes a filtrar")
         const filtroAsistentes = eventos.filter(eventoActual => eventoActual.asistentes >= minimoAsistentes)
+
+        if (!minimoAsistentes) alert("Mínimo de asistentes vacío")
+
+        document.write("<h1>Filtro por mínimo de asistentes:"+minimoAsistentes+"</h1>")
+        for(evento of filtroAsistentes) {
+            document.write("<p>Nombre: "+evento.nombre+"</p>")
+            document.write("<p>Fecha: "+evento.fecha+"</p>")
+            document.write("<p>Categoria: "+evento.categoria+"</p>")
+            document.write("<p>Ubicación: "+evento.ubicacion+"</p>")
+            document.write("<p>Asistentes: "+evento.asistentes+"</p>")
+            document.write("<br>")
+        }
 
         //Convertir la lista en JSON
         const listaJSON = JSON.stringify(eventos)
+
+        document.write("<br><br><h1>Fomarto JSON de eventos: "+listaJSON+"</h1>")
 
         //Mostrar en consola
         for(evento of eventos) {

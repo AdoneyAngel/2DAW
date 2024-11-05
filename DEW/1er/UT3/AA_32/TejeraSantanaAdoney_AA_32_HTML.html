@@ -59,31 +59,87 @@
         //Filtrar productos
 
         //----------------------Por rango precios
+        // const filtroRangMin = prompt("Filtro por precio (Mínimo precio)")
+        // const filtroRangMax = prompt("Filtro por precio (Maximo precio)")
         const filtroRangMax = 200
         const filtroRangMin = 0
 
         const filtroPrecios = productos.filter(productoActual => productoActual.precio <= filtroRangMax && productoActual.precio >= filtroRangMin)
 
+        document.write("<h1>Filtro de precios: "+filtroRangMin+"-"+filtroRangMax+"</h1>")
+        for (producto of filtroPrecios) {
+            document.write("<p>ID: "+producto.id+"</p>")
+            document.write("<p>Nombre: "+producto.nombre+"</p>")
+            document.write("<p>Fecha de ingreso: "+producto.fechaIngreso+"</p>")
+            document.write("<p>Precio: "+producto.precio+"</p>")
+            document.write("<p>Cantidad: "+producto.cantidad+"</p>")
+            document.write("<br>")
+        }
+
         //----------------------Por cantidad
+        // const cantidadEspecifica = prompt("Filtro por cantidad especificada")
         const cantidadEspecifica = 50
         const filtroCantidad = productos.filter(productoActual => productoActual.cantidad === cantidadEspecifica)
 
+        document.write("<h1>Filtro de cantidad: "+cantidadEspecifica+"</h1>")
+        for (producto of filtroCantidad) {
+            document.write("<p>ID: "+producto.id+"</p>")
+            document.write("<p>Nombre: "+producto.nombre+"</p>")
+            document.write("<p>Fecha de ingreso: "+producto.fechaIngreso+"</p>")
+            document.write("<p>Precio: "+producto.precio+"</p>")
+            document.write("<p>Cantidad: "+producto.cantidad+"</p>")
+            document.write("<br>")
+        }
+
         //----------------------Por palabra clave
+        // const palabraClave = prompt("Filtro por palabra clave")
         const palabraClave = "Laptop"
         const filtroPalabra = productos.filter(productoActual => productoActual.nombre === palabraClave)
+
+        document.write("<h1>Filtro por palabra clave: "+palabraClave+"</h1>")
+        for (producto of filtroPalabra) {
+            document.write("<p>ID: "+producto.id+"</p>")
+            document.write("<p>Nombre: "+producto.nombre+"</p>")
+            document.write("<p>Fecha de ingreso: "+producto.fechaIngreso+"</p>")
+            document.write("<p>Precio: "+producto.precio+"</p>")
+            document.write("<p>Cantidad: "+producto.cantidad+"</p>")
+            document.write("<br>")
+        }
 
         //Ordenar productos
 
         //----------------------Por precio (Ascendente)
         let productoOrdenadoPrecio = [...productos]
         productoOrdenadoPrecio = productoOrdenadoPrecio.sort((a, b) => (a.precio<b.precio)?-1:((a.precio>b.precio)?1:0))
+
+        document.write("<h1>Productos ordenados por precio</h1>")
+        for (producto of productoOrdenadoPrecio) {
+            document.write("<p>ID: "+producto.id+"</p>")
+            document.write("<p>Nombre: "+producto.nombre+"</p>")
+            document.write("<p>Fecha de ingreso: "+producto.fechaIngreso+"</p>")
+            document.write("<p>Precio: "+producto.precio+"</p>")
+            document.write("<p>Cantidad: "+producto.cantidad+"</p>")
+            document.write("<br>")
+        }
         
         //----------------------Por cantidad (Ascendente)
         let productoOrdenadoCantidad = [...productos]
         productoOrdenadoCantidad = productoOrdenadoCantidad.sort((a, b) => (a.cantidad<b.cantidad)?-1:((a.cantidad>b.cantidad)?1:0))
 
+        document.write("<h1>Productos ordenados por cantidad</h1>")
+        for (producto of productoOrdenadoCantidad) {
+            document.write("<p>ID: "+producto.id+"</p>")
+            document.write("<p>Nombre: "+producto.nombre+"</p>")
+            document.write("<p>Fecha de ingreso: "+producto.fechaIngreso+"</p>")
+            document.write("<p>Precio: "+producto.precio+"</p>")
+            document.write("<p>Cantidad: "+producto.cantidad+"</p>")
+            document.write("<br>")
+        }
+
         //Convertir la lista en JSON
         const listaJSON = JSON.stringify(productos)
+
+        document.write("<br><br><h1>Lista en formato JSON:"+listaJSON+"</h1>")
 
         //Mostrar productos
         for (producto of productos) {

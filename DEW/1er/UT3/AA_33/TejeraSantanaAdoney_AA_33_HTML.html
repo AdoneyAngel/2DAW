@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA_33</title>
+</head>
+<body>
+    
+<script>
+
+let productos = [
+    {
+        nombre: "Mesa",
+        categoria: "mueble",
+        precio: 200,
+        cantidad: 2
+    },
+    {
+        nombre: "Silla",
+        categoria: "mueble",
+        precio: 50,
+        cantidad: 4
+    },
+    {
+        nombre: "Televisión",
+        categoria: "electrodoméstico",
+        precio: 700,
+        cantidad: 1
+    }
+]
+
+//----------------------Peticiones para nuevo producto !DESCOMENTAR PARA PETICIONES!
+
+// const nombreNuevoProducto = prompt("Nombre del nuevo producto")
+// const categoriaNuevoProducto = prompt("Categoría del nuevo producto")
+// const precioNuevoProducto = prompt("Precio del nuevo producto")
+// const cantidadNuevoProducto = prompt("Número de unidades")
+// const nuevoProducto = {
+//     nombre: nombreNuevoProducto,
+//     categoria: categoriaNuevoProducto,
+//     precio: precioNuevoProducto,
+//     cantidad: cantidadNuevoProducto
+// }
+
+// productos.push(nuevoProducto)
+
+//Se calcula el coste total
+const valorTotal = productos.reduce((productoPrevio, productoActual) => {
+    const precioPrevio = productoPrevio.precio ? productoPrevio.precio*productoPrevio.cantidad : productoPrevio
+    return (precioPrevio+(productoActual.precio*productoActual.cantidad))
+})
+
+//----------------------Filtrar por categoria
+/*
+Estructura: {
+    categoria: "nombre categoria",
+    productos: [{El objeto producto de dicha categoria}]
+}
+*/
+let filtroCategoria = []
+
+for (producto of productos) {
+    //Se recorre la lista de filtroCategoria, si no se encuentra la misma categoria se agrega la categoria y dentro el producto, si encuentra la categoria lo inserta en dicha categoria
+    let categoriaExiste = false
+
+    for (filtro of filtroCategoria) {
+        if (filtro.categoria === producto.categoria) {
+            filtro.productos.push(producto)
+            categoriaExiste = true
+
+            break
+        }
+    }
+
+    //Si no se encuentra la categoria en el filtro, se agrega la nueva categoria con el producto
+    if (!categoriaExiste) {
+        const nuevaCategoriaFiltro = {
+            categoria: producto.categoria,
+            productos: [producto]
+        }
+        
+        filtroCategoria.push(nuevaCategoriaFiltro)
+    }
+}
+
+//----------------------En formato JSON
+const productosJSON = JSON.stringify(productos)
+
+</script>
+
+<h2>Productos</h2>
+<ul>
+    <script>
+
+        for (producto of productos) {
+            document.write("<li>"+producto.nombre+", Categoria: "+producto.categoria+", Precio: "+producto.precio+"€, Unidades: "+producto.cantidad+"</li>")
+        }
+
+    </script>
+</ul>
+
+<br>
+
+<!--Valor total del inventario-->
+<h2>
+    <script>
+        document.write("Valor total del inventario: " + valorTotal + "€")
+    </script>
+</h2>
+<br>
+
+<!--Lista de los productos filtrados por categoria-->
+<h2>Filtrado por categoría</h2>
+<ul>
+    <script>
+        
+        for (filtro of filtroCategoria) {
+            document.write("<li>"+filtro.categoria+"</li>")//Nombre categoria
+
+            //Lista de productos
+            document.write("<ul>")
+                for (producto of filtro.productos) {
+                    document.write("<li>"+producto.nombre+", Precio: "+producto.precio+"€, Unidades: "+producto.cantidad+"</li>")
+                }
+            document.write("</ul>")
+        }
+
+    </script>
+</ul>
+
+<br>
+
+<h2>Listado en JSON</h2>
+<p><script>document.write(productosJSON)</script></p>
+
+<br>
+
+<h2>Fecha actual: <u><script>document.write(new Date())</script></u></h2>
+
+</body>
+</html>

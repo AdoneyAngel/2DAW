@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA_42_JS</title>
+</head>
+<body>
+    
+<script>
+
+//Definición de clases
+class Usuario {
+    _id
+    _nombre
+    _tareas
+    _rol
+    //rol = "Administrador" | "Miembro"
+
+    constructor(id, nombre, rol) {
+        this._id = id
+        this._nombre = nombre
+        this._rol = rol
+        this._tareas = []
+    }
+
+    asignarTarea(tarea) {
+        if (tarea.getEstado() != "Completada") {
+            this._tareas.push(tarea)
+        }
+    }
+
+    getId() {
+        return this._id
+    }
+
+    mostrar() { //Se crea un método que mostrará su propia información, esto para no tener que escribir muchas lineas repetidas en distintas partes
+        document.write("<ul>")
+            document.write("<li>ID: "+this._id+"</li>")
+            document.write("<li>Nombre: "+this._nombre+"</li>")
+            document.write("<li>Rol: "+this._rol+"</li>")
+            document.write("<li>Tareas:")//Mostrar todas las tareas
+
+                document.write("<ul>")
+
+                    for (let tarea of this._tareas) {
+                        document.write("<li>Titulo: "+tarea.getTitulo()+"</li>")
+                    }
+
+                document.write("</ul>")
+
+            document.write("</li>")
+        document.write("</ul>")
+    }
+}
+
+class Tarea {
+    _id
+    _titulo
+    _descripcion
+    _estado 
+    _usuarioAsignado
+    //estado = "Pendiente" | "En Progreso" | "Completada"
+
+    constructor(id, titulo, descripcion, estado = "Pendiente") {
+        this._id = id
+        this._titulo = titulo
+        this._descripcion = descripcion
+        this._estado = estado
+        this._usuarioAsignado = -1
+    }
+
+    getId() {
+        return this._id
+    }
+    getEstado() {
+        return this._estado
+    }
+    getUsuarioAsignado() {
+        return this._usuarioAsignado
+    }
+    getTitulo() {
+        return this._titulo
+    }
+
+    cambiarEstado(estado) {
+        this._estado = estado
+    }
+
+    asignarUsuario(usuarioId) {
+        this._usuarioAsignado = usuarioId
+    }
+
+    mostrar() { //Se crea un método que mostrará su propia información, esto para no tener que escribir muchas lineas repetidas en distintas partes
+        document.write("<ul>")
+            document.write("<li>ID: "+this._id+"</li>")
+            document.write("<li>Titulo: "+this._titulo+"</li>")
+            document.write("<li>Descripcion: "+this._descripcion+"</li>")
+            document.write("<li>Estado: "+this._estado+"</li>")
+            document.write("<li>ID usuario asignado: "+this._usuarioAsignado+"</li>")
+        document.write("</ul>")
+    }
+}
+
+class Proyecto {
+    _nombre
+    _tareas
+    _usuarios
+    _usuarioAsignado
+
+    constructor(nombre) {
+        this._nombre = nombre
+        this._tareas = []
+        this._usuarios = []
+    }
+    
+    getUsuarios() {
+        return this._usuarios
+    }
+
+    agregarUsuario(usuario) {
+        this._usuarios.push(usuario)
+    }
+
+    removerUsuario(usuarioId) {
+        for (let index = 0; index<this._usuarios.length; index++) {
+            if (this._usuarios[index].getId() == usuarioId) {
+                delete this._usuarios[index]
+            }
+        }
+    }
+
+    agregarTarea(tarea) {
+        this._tareas.push(tarea)
+    }
+
+    asignarTareaAUsuario(tareaId, usuarioId) {
+        for (let usuario of this._usuarios) {//Recorrer usuarios
+            if (usuario && usuario.getId() == usuarioId) {
+                
+                for (let tarea of this._tareas) {//Recorrer tareas
+                    if (tarea && tarea.getId() == tareaId) {
+                        //Se actualiza los atributos de los objetos
+                        tarea.asignarUsuario(usuario.getId())
+                        usuario.asignarTarea(tarea)
+                    }
+                }
+                
+            }
+        }
+    }
+
+    listarTareasPorEstado(estado) {
+        const tareasFiltro = this._tareas.filter(tarea => tarea.getEstado() === estado)
+
+        //Mostrar tareas
+        document.write("<h2>Lista de tareas por estado: "+estado+"</h2>")
+        
+        for (let tarea of tareasFiltro) {
+            if (tarea) {
+                tarea.mostrar()
+            }
+        }
+
+    }
+
+    listarTareasPorUsuario(usuarioId) {
+        const tareasFiltro = this._tareas.filter(tarea => tarea.getUsuarioAsignado() === usuarioId)
+
+        //Mostrar tareas
+        document.write("<h2>Lista de tareas por usuario: "+usuarioId+"</h2>")
+        
+        for (let tarea of tareasFiltro) {
+            if (tarea) {
+                tarea.mostrar()
+            }
+        }
+    }
+}
+
+
+</script>
+
+
+
+<!--Flujo inicial/prueba-->
+<script>
+
+//Proyecto
+const proyecto = new Proyecto("mi proyecto")
+
+//Crear usuarios e insertarlo
+const usuario1 = new Usuario(1, "Adoney", "Miembro")
+const usuario2 = new Usuario(2, "Juan", "Administrador")
+const usuario3 = new Usuario(3, "Pedro", "Miembro")
+
+proyecto.agregarUsuario(usuario1)
+proyecto.agregarUsuario(usuario2)
+proyecto.agregarUsuario(usuario3)
+
+//Eliminar usuario
+proyecto.removerUsuario(3)
+
+//Mostrar usuarios en la página
+document.write("<h2>Lista de usuarios</h2>")
+for (let usuario of proyecto.getUsuarios()) {
+    if (usuario) usuario.mostrar()
+}
+
+//Crear tareas e insertarlas
+const tarea1 = new Tarea(1, "tar1", "Tarea que hay que hacer 1111", "En Progreso")
+const tarea2 = new Tarea(2, "tar2", "Tarea que hay que hacer 2222", "Completada")
+const tarea3 = new Tarea(3, "tar3", "Tarea que hay que hacer 3333", "Pendiente")
+
+proyecto.agregarTarea(tarea1)
+proyecto.agregarTarea(tarea2)
+proyecto.agregarTarea(tarea3)
+
+//Asignar tarea
+proyecto.asignarTareaAUsuario(3, 2)
+
+//Mostrar usuarios en la página despues de asignar la tarea
+document.write("<h2>Lista de usuarios despues de asignar la tarea</h2>")
+for (let usuario of proyecto.getUsuarios()) {
+    if (usuario) usuario.mostrar()
+}
+
+//Listar tareas por estado
+proyecto.listarTareasPorEstado("En Progreso")
+
+//Listar tareas por usuario
+proyecto.listarTareasPorUsuario(2)
+
+</script>
+
+</body>
+</html>

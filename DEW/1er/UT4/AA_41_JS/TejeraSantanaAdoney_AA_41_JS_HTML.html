@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA_41_JS</title>
+</head>
+<body>
+    
+<script>
+
+    //Definición de clases
+
+    class Libro {
+        _titulo
+        _autor
+        _año
+        _prestado
+
+        constructor (titulo, autor, año, prestado = false) {
+            this._titulo = titulo
+            this._autor = autor
+            this._año = año
+            this._prestado = prestado
+        }
+        getTitulo() {
+            return this._titulo
+        }
+        getAutor() {
+            return this._autor
+        }
+        getAño() {
+            return this._año
+        }
+        getPrestado() {
+            return this._prestado
+        }
+
+        prestar() {
+            this._prestado = true
+        }
+
+        devolver() {
+            this._prestado = false
+        }
+    }
+
+    class Biblioteca {
+        _nombre
+        _libros
+
+        constructor (nombre) {
+            this._nombre = nombre
+            this._libros = []
+        }
+
+        agregarLibro(libro) {
+            this._libros.push(libro)
+        }
+
+        eliminarLibro(titulo) {
+            for (let index = 0; index<this._libros.length; index++) {
+                const libro = this._libros[index]
+
+                if (libro.getTitulo() === titulo) {
+                    delete this._libros[index]
+                }
+            }
+        }
+
+        listarLibrosDisponibles() {
+            //Se filtra los libros que no estén prestados
+            const librosDisponibles = this._libros.filter(libro => !libro.getPrestado())
+
+            //Se lista cada libro
+            document.write("<h2>Libros disponibles</h2>")
+            for (let libro of librosDisponibles) {
+                document.write("Titulo: "+libro.getTitulo()+", Autor: "+libro.getAutor()+", Año: "+libro.getAño()+"<br>")
+            }
+        }
+
+        buscarLibro(titulo) {
+            const libroEncontrado = this._libros.find(libro => libro ? libro.getTitulo() === titulo : false)
+
+            return libroEncontrado
+        }
+    }
+
+</script>
+
+
+<!--Flujo inicial/prueba-->
+<script>
+    //Se inicializa la biblioteca y los libros
+
+    let biblioteca = new Biblioteca("miBiblio")
+    
+    let libro1 = new Libro("1", "yo", "2024", false)
+    let libro2 = new Libro("2", "yo", "2024", false)
+    let libro3 = new Libro("3", "yo", "2024", false)
+    let libro4 = new Libro("4", "yo", "2024", false)
+
+    //Cambiar a prestado
+    libro3.prestar()
+    libro1.prestar()
+
+    //Cambiar a devuelto
+
+    libro1.devolver()
+
+    //Agregar libros
+
+    biblioteca.agregarLibro(libro1)
+    biblioteca.agregarLibro(libro2)
+    biblioteca.agregarLibro(libro3)
+    biblioteca.agregarLibro(libro4)
+
+    //Eliminar libro
+
+    biblioteca.eliminarLibro("2")
+
+    //Listar libros disponibles
+
+    biblioteca.listarLibrosDisponibles()
+
+    //Buscar libro
+
+    const libroBuscado = biblioteca.buscarLibro("4")
+
+    document.write("<h2>Libro buscado</h2> Titulo: "+libroBuscado.getTitulo()+", Autor: "+libroBuscado.getAutor())
+
+</script>
+
+
+</body>
+</html>

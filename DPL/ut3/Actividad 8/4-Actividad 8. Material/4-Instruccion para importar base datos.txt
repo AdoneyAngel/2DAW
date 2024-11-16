@@ -1,0 +1,4 @@
+1.INSTRUCCIÓN PARA IMPORTAR ARCHIVO sql A BASE DATOS MySQL DESDE TERMINAL:
+-------------------------------------------------------------------------
+
+mysql –u usuario_mysql -p < ruta_fichero_importación.sql

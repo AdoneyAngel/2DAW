@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA_EXAMEN_A</title>
+</head>
+<body>
+    
+<script>
+
+//Variables estaticas
+const fechaActual = new Date()
+const nUsuarios = 3 //Numero maximo de usuarios
+const maxProductos = 5 //Numero maximo de producto por usuario
+const nProductos = [] //Sera una array, el cual servira para hacer que cada usuario tenga un numero de productos aleatorio
+const variacionDiasCompraProducto = 10 //La fecha de producto se basa en la actual, restando un numero aleatorio de 0-esta variable
+const variacionDiasNacimiento = 365*65 //La fecha de nacimiento se basa en la actual, restando un numero aleatorio de 0-esta variable
+
+//Valores permitidos
+const paises = ["España", "Francia", "Alemania"]
+const ciudades = [["Madrid", "Barcelona", "Valencia"], ["CiudadFrancia1", "CiudadFrancia2", "CiudadFrancia3"],  ["CiudadAlemania1", "CiudadAlemania2", "CiudadAlemania3"]]
+
+const nombreProductos = ["Teléfono", "Licuadora", "Cable ethernet"]
+const precioProductos = [700, 150, 20]
+const estadoProductos = ["Pendiente", "En proceso", "Completado"]
+
+let usuarios = []
+
+//Valores aleatorios para los usuarios
+const randPais1 = Math.round(Math.random()*(paises.length-1))
+const randCiudad1 = Math.round(Math.random()*(ciudades.length-1))
+
+const randPais1B = Math.round(Math.random()*(paises.length-1))
+const randCiudad1B = Math.round(Math.random()*(ciudades.length-1))
+
+const randPais2 = Math.round(Math.random()*(paises.length-1))
+const randCiudad2 = Math.round(Math.random()*(ciudades.length-1))
+
+const randPais2B = Math.round(Math.random()*(paises.length-1))
+const randCiudad2B = Math.round(Math.random()*(ciudades.length-1))
+
+//---------------Generar de usuarios
+
+for (let userIndex = 0; userIndex<nUsuarios; userIndex++) {
+    const randPais = Math.round(Math.random()*(paises.length-1))
+    const randCiudad = Math.round(Math.random()*(ciudades.length-1))
+
+    const randPaisB = Math.round(Math.random()*(paises.length-1))
+    const randCiudadB = Math.round(Math.random()*(ciudades.length-1))
+
+    const diasRestarCumpleaños = Math.floor(Math.random()*(variacionDiasNacimiento)) //Variedad de entre 0 a (365*60)=un año a 65 años, dia a dia
+
+    const nProductosUsuario = Math.round(Math.random()*(maxProductos))//cada usuario tendra un numero aleatorio de productos
+
+    let usuarioNacimiento = new Date()
+    usuarioNacimiento.setDate(usuarioNacimiento.getDate()-diasRestarCumpleaños)
+
+    const usuario = {
+        id: userIndex,
+        nombre: "Usuario "+userIndex,
+        fechaNacimiento: usuarioNacimiento,
+        direcciones: [
+            {
+                pais: paises[randPais],
+                ciudad: ciudades[randPais][randCiudad],
+                direccionElegida: false
+            },
+            {
+                pais: paises[randPaisB],
+                ciudad: ciudades[randPaisB][randCiudadB],
+                direccionElegida: true
+            }
+        ],
+        compras: []
+    }
+
+    usuarios.push(usuario)
+    nProductos.push(nProductosUsuario)
+}
+
+//---------------Generación de productos
+
+for (let userIndex = 0; userIndex<usuarios.length; userIndex++) {//Se genera los productos de cada usuario
+    const usuario = usuarios[userIndex]
+
+    const nProductosUsuario = nProductos[userIndex]
+
+    //Se obtiene la edad del usuario
+    const edadUsuario = Math.floor((fechaActual-usuario.fechaNacimiento)/(1000*60*60*24*365)) //Fijo hasta que consigua sacar la edad
+
+    for (let productoIndex = 0; productoIndex<nProductosUsuario; productoIndex++) {//Se genera n="nProductosUsuario" productos de este usuario
+        const nombreProductoPos = Math.round(Math.random()*(nombreProductos.length-1))
+        const nDiasMenos = Math.round(Math.random()*variacionDiasCompraProducto)//Se elige el numero de dias que se restará al actual de forma aleatoria
+        const estadoProductoPos = Math.round(Math.random()*(estadoProductos.length-1))
+
+        const nombreProducto = nombreProductos[nombreProductoPos]
+        const precioProducto = precioProductos[nombreProductoPos]
+        const estadoProducto = estadoProductos[estadoProductoPos]
+
+        let fechaProducto = new Date()
+        fechaProducto.setDate(Number(fechaProducto.getDate())-nDiasMenos)
+
+        //Se aplica el descuento
+        let descuento = 0
+
+        if (edadUsuario <= 12) {
+            descuento = .15
+
+        } else if (edadUsuario > 12 && edadUsuario <= 18) {
+            descuento = .20
+
+        } else if (edadUsuario >= 60) {
+            descuento = .30
+        }
+
+        //Comprobar si es su compleaños
+        if (fechaActual.getDate() == usuario.fechaNacimiento.getDate() && fechaActual.getMonth() == usuario.fechaNacimiento.getMonth()) {
+            descuento *= .10
+        }
+
+        const precioFinal = precioProducto * (1 - descuento)
+
+        //Objeto compra
+        const nuevaCompra = {
+            nombre: nombreProducto,
+            precio: precioProducto,
+            estado: estadoProducto,
+            fecha: fechaProducto,
+            precioFinal: precioFinal,
+            descuento
+        }
+    
+        usuario.compras.push(nuevaCompra)
+
+    }
+    
+}
+
+</script>
+
+
+
+<!--##############################Separacion entre el flujo de la pagina y la generacion de datos-->
+
+
+
+<script>
+
+//Mostrar usuarios
+document.write("<h1>Usuarios</h1><ul>")
+for (let usuario of usuarios) {
+    document.write("<li>Nombre"+usuario.nombre+"</li>")
+
+    //Informacion del usuario
+    document.write("<ul>")
+        document.write("<li>ID: "+usuario.id+"</li>")
+        document.write("<li>Fecha nacimiento: "+usuario.fechaNacimiento+"</li>")
+        document.write("<li>Direcciones: </li>")
+
+        //Mostrar direcciones
+        document.write("<ul>")
+            for (let direccion of usuario.direcciones) {
+                document.write("<li>"+direccion.pais+", "+direccion.ciudad+"</li>")
+            }
+        document.write("</ul>")
+
+        document.write("<li>Compras: </li>")
+
+        //Mostrar compras
+        document.write("<ul>")
+            for (let compra of usuario.compras) {
+                document.write("<li>Producto: "+compra.nombre+"</li>")
+                
+                //Informacion del producto
+                document.write("<ul>")
+                    document.write("<li>Precio original: "+compra.precio+"</li>")
+                    document.write("<li>Descuento: "+(compra.descuento*100)+"%</li>")
+                    document.write("<li>Precio final: "+compra.precioFinal+"</li>")
+                    document.write("<li>Fecha de compra: "+compra.fecha+"</li>")
+                    document.write("<li>Estado: "+compra.estado+"</li>")
+                document.write("</ul>")
+            }
+        document.write("</ul>")
+        
+    document.write("</ul>")
+}
+
+//---------------Operaciones del sistema (Filtrar usuarios)
+
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+
+//-------Felicitar usuarios por su cumple
+document.write("<h1>Felicidades por cumplir años a:</h1><ul>")
+for (let usuario of usuarios) {
+    if (fechaActual.getDate() == usuario.fechaNacimiento.getDate() && fechaActual.getMonth() == usuario.fechaNacimiento.getMonth()) {
+        document.write("<li>"+usuario.nombre+": "+usuario.fechaNacimiento+"</li>")
+    }
+}
+document.write("</ul>")
+
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+
+//-------Filtrar por rango de edad
+const minEdad = 10
+const maxEdad = 30
+
+document.write("<h1>Filtro por rango de edad (Min: "+minEdad+", Max: "+maxEdad+")</h1><ul>")
+for (let usuario of usuarios) {
+    const edadUsuario = Math.floor((fechaActual-usuario.fechaNacimiento)/(1000*60*60*24*365))
+
+    if (edadUsuario >= minEdad && edadUsuario <= maxEdad) {
+        document.write("<li>"+usuario.nombre+": "+edadUsuario+" años</li>")
+    }
+}
+document.write("</ul>")
+
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+
+//-------Filtrar por ciudad
+const ciudadFiltrada = "Madrid"
+
+document.write("<h1>Filtro por ciudad: "+ciudadFiltrada+"</h1><ul>")
+for (let usuario of usuarios) {
+    let pertenecienteACiudad = false
+    let direccionCoincidida
+
+    //Se busca en cada una de sus rutas
+    for (let direccion of usuario.direcciones) {
+        if (direccion.ciudad == ciudadFiltrada) {
+            pertenecienteACiudad = true
+            direccionCoincidida = direccion
+        }
+    }
+
+    if (pertenecienteACiudad) {
+        document.write("<li>"+usuario.nombre+": "+direccionCoincidida.pais+", "+direccionCoincidida.ciudad+"</li>")
+    }
+}
+document.write("</ul>")
+
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+
+//-------Filtrar por fecha de compra
+const fechaCompra = new Date("2024-11-10")
+
+document.write("<h1>Filtro por fecha de compra: "+fechaCompra+"</h1><ul>")
+for (let usuario of usuarios) {
+    let haRealizadoCompra = false
+    let comprasRealizadas = []
+
+    for (let producto of usuario.compras) {
+        if (producto.fecha.getDate() == fechaCompra.getDate() && producto.fecha.getMonth() == fechaCompra.getMonth() && producto.fecha.getFullYear() == fechaCompra.getFullYear()){
+            haRealizadoCompra = true
+
+            comprasRealizadas.push(producto)
+        }
+    }
+
+    if (haRealizadoCompra) {
+        document.write("<li>"+usuario.nombre+": </li>")
+        
+        document.write("<ul>")
+            for (const compra of comprasRealizadas) {
+                document.write("<li>"+compra.nombre+": "+compra.fecha+", "+compra.precioFinal+"€</li>")
+            }
+        document.write("</ul>")
+    }
+
+}
+document.write("</ul>")
+
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+
+//---------------Operaciones del sistema (Generar reporte de compras)
+//-------Obtener total de compras por usuario
+const totalCompraUsuarioId = 0 //ID del usuario
+const totalCompraUsuario = usuarios.filter(usuario => usuario.id === totalCompraUsuarioId)[0]
+
+let precioTotal = 0
+
+for (const compra of totalCompraUsuario.compras) {
+    precioTotal += compra.precioFinal
+}
+
+document.write("<h1>Coste total de compras de "+totalCompraUsuario.nombre+": "+precioTotal+"€</h1>")
+
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+
+//-------Obtener lista de productos
+const listaUsuarioId = 1
+const listaUsuario = usuarios.filter(usuario => usuario.id === listaUsuarioId)[0]
+
+document.write("<h1>Lista de compras de "+listaUsuario.nombre+"</h1><ul>")
+for (const compra of listaUsuario.compras) {
+    document.write("<li>Producto: "+compra.nombre+"</li>")
+                
+    //Informacion del producto
+    document.write("<ul>")
+        document.write("<li>Precio original: "+compra.precio+"</li>")
+        document.write("<li>Descuento: "+(compra.descuento*100)+"%</li>")
+        document.write("<li>Precio final: "+compra.precioFinal+"</li>")
+        document.write("<li>Fecha de compra: "+compra.fecha+"</li>")
+        document.write("<li>Estado: "+compra.estado+"</li>")
+    document.write("</ul>")
+}
+document.write("</ul>")
+
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+document.write("<br>")
+
+//---------------Operaciones del sistema (Exportar datos)
+const usuariosJSON = JSON.stringify(usuarios)
+
+document.write("<h1>JSON de usuarios:</h1>")
+document.write("<p>"+usuariosJSON+"</p>")
+</script>
+
+</body>
+</html>

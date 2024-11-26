@@ -25,7 +25,7 @@ export class Direccion {
   }
 
   selectRandomCiudad() {
-    const posicion = Math.round(Math.random()*this.#pais.getCiudades().length)
+    const posicion = Math.round(Math.random()*(this.#pais.getCiudades().length-1))
 
     this.#ciudad = this.#pais.getCiudades()[posicion]
   }

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AA_46</title>
+</head>
+<body>
+    <script>
+
+
+        //----------Definicio de clases
+        class vehiculo {
+            marca
+            modelo
+            itv
+
+            constructor (marca, modelo, itv = new Date()) {
+                this.marca = marca
+                this.modelo = modelo
+                this.itv = itv
+            }
+
+            getMarca() {
+                return this.marca
+            }
+            getModelo() {
+                return this.modelo
+            }
+            getItv() {
+                return this.itv
+            }
+            setItv(itv) {
+                this.itv = itv
+            }
+        }
+
+        class marca {
+            id
+            nombre
+            modelos
+
+            constructor (id, nombre, modelos = []) {
+                this.id = id
+                this.nombre = nombre
+                this.modelos = modelos
+            }
+
+            añadirModelos (modelo) {
+                this.modelos.push(modelo)
+            }
+
+            getId() {
+                return this.id
+            }
+            getNombre() {
+                return this.nombre
+            }
+            getModelos() {
+                return this.modelos
+            }
+        }
+
+        class modelo {
+            id
+            nombre
+
+            constructor (id, nombre) {
+                this.id = id
+                this.nombre = nombre
+            }
+
+            getNombre() {
+                return this.nombre
+            }
+        }
+
+        class conductor {
+            id
+            nombre
+            nacimiento
+            vehiculos
+            puntos
+            historialInfracciones
+
+            constructor (id, nombre, nacimiento, vehiculos=[], puntos=12, historialInfracciones = []) {
+                this.id = id
+                this.nombre = nombre
+                this.nacimiento = nacimiento
+                this.vehiculos = vehiculos
+                this.historialInfracciones = historialInfracciones
+                if (puntos < 0) {
+                    this.puntos = 0
+
+                } else {
+                    this.puntos = puntos
+                }
+
+            }
+
+            getId() {
+                return this.id
+            }
+            getNombre() {
+                return this.nombre
+            }
+            getNacimiento() {
+                return this.nacimiento
+            }
+            getVehiculos() {
+                return this.vehiculos
+            }
+            getPuntos() {
+                return this.puntos
+            }
+            getHistorial() {
+                return this.historialInfracciones
+            }
+        }
+
+        class historialInfracciones {
+            infracciones
+
+            constructor (infracciones = []) {
+                this.infracciones = infracciones
+            }
+
+            getInfracciones() {
+                return this.infracciones
+            }
+
+            añadirInfraccion(infraccion) {
+                this.infracciones.push(infraccion)
+            }
+
+            calcularDescuento() {
+                if (this.infracciones.length == 0) {
+                    return .5
+
+                } else if(this.infracciones.length >= 1 && this.infracciones.length <= 3) {
+                    return .20
+
+                } else {
+                    return 0
+                }
+            }
+        }
+
+        class infraccion {
+            tipo
+            fecha
+            montoFinal
+            descuento
+
+            constructor (tipo, fecha) {
+                this.tipo = tipo
+                this.fecha = fecha
+
+                this.montoFinal = tipo.getMonto()
+            }
+            getTipo() {
+                return this.tipo
+            }
+            getDescuento() {
+                return this.descuento
+            }
+            getMontoFinal() {
+                return this.montoFinal
+            }
+
+            setMontoFinal(monto) {
+                this.montoFinal = monto
+            }
+            aplicarDescuento(descuento) {
+                this.descuento = descuento
+                this.montoFinal = this.montoFinal-this.tipo.monto*descuento
+            }
+        }
+
+        class tipoInfraccion {
+            id
+            nombre
+            monto
+            puntos
+
+            constructor (id, nombre, monto, puntos) {
+                this.id = id
+                this.nombre = nombre
+                this.monto = monto
+                this.puntos = puntos
+            }
+            getId() {
+                return this.id
+            }
+            getNombre() {
+                return this.nombre
+            }
+            getMonto() {
+                return this.monto
+            }
+            getPuntos() {
+                return this.puntos
+            }
+        }
+
+        //----------Creacion de objetos predefinidos
+
+        //-----Modelos
+        //Mazda
+        const mx5 = new modelo(0, "MX-5")
+        const rx7 = new modelo(1, "RX-7")
+
+        //Ford
+        const focus = new modelo(2, "Focus")
+        const mustang = new modelo(3, "Mustang")
+
+        //Nissan
+        const z370 = new modelo(4, "370z") 
+        const qhasqai = new modelo(5, "Qashqai")
+
+        //-----Marcas
+        const mazda = new marca(0, "Mazda", [mx5, rx7])
+        const ford = new marca(1, "Ford", [focus, mustang])
+        const nissan = new marca(2, "Nissan", [z370, qhasqai])
+
+        const marcas = [mazda, ford, nissan]
+
+        //-----Tipos infracciones
+        const excesoDeVelocidad = new tipoInfraccion(0, "Exceso de velocida", 200, 4)
+        const faltaDeCinturon = new tipoInfraccion(1, "Falta de cinturón", 400, 5)
+        const faltaDeLuces = new tipoInfraccion(2, "Falta de luces", 150, 1)
+        const excesoDeCarga = new tipoInfraccion(3, "Exceso de carga", 250, 1)
+        const excesoDeRuido = new tipoInfraccion(4, "Exceso de ruido", 100, 0)
+        const atropello = new tipoInfraccion(5, "Atropello", 10000, 12)
+
+        const tiposInfracciones = [excesoDeVelocidad, faltaDeCinturon, atropello, faltaDeCinturon, faltaDeLuces, excesoDeCarga, excesoDeRuido]
+
+        //----------Variables estátitcas
+        const nConductores = 3
+        const nVehiculos = 2
+        const maxInfracciones = 4
+        const diasRestarNacimiento = (365*40)
+        const diasRestarItv = 365*2
+        const diasRestarInfraccion = 365*3
+
+        let conductores = []
+
+        //----------Generar conductores
+        for (let idConductor = 0; idConductor<nConductores; idConductor++) {
+            //Nombre
+            const usuarioNombre = "Usuario"+idConductor
+
+            //Nacimiento
+            let usuarioNacimiento = new Date()
+            usuarioNacimiento.setDate(usuarioNacimiento.getDate()-(Math.random()*diasRestarNacimiento))
+
+            //Vehiculos
+            let usuarioVehiculos = []
+
+            for (let IVehiculo = 0; IVehiculo<nVehiculos; IVehiculo++) {
+                const marcaActual = marcas[Math.round(Math.random()*(marcas.length-1))] 
+                const modeloActual = marcaActual.modelos[Math.round(Math.random()*(marcaActual.getModelos().length-1))]
+
+                let itvActual = new Date()
+                itvActual.setDate(itvActual.getDate()-(Math.random()*diasRestarItv))
+
+                const vehiculoActual = new vehiculo (marcaActual, modeloActual, itvActual)
+
+                usuarioVehiculos.push(vehiculoActual)
+            }
+
+            //Historial de infracciones
+            const usuarioHistorial = new historialInfracciones([])
+
+            //Infracciones
+            const nInfracciones = Math.round(Math.random()*maxInfracciones)
+            for (let IInfraccion = 0; IInfraccion<nInfracciones; IInfraccion++) {
+                const tipoActual = tiposInfracciones[Math.round(Math.random()*(tiposInfracciones.length-1))]
+
+                let fechaActual = new Date()
+                fechaActual.setDate(fechaActual.getDate()-(Math.random()*diasRestarInfraccion))
+
+                let infraccionActual = new infraccion(tipoActual, fechaActual)
+
+                //Aplicar descuento
+                const descuento = usuarioHistorial.calcularDescuento()
+
+                infraccionActual.aplicarDescuento(descuento)
+
+                usuarioHistorial.añadirInfraccion(infraccionActual)
+            }
+
+            //Puntos de la licencia
+            let puntosLicencia = 12
+
+            for (infIndex = 0; infIndex<usuarioHistorial.getInfracciones().length; infIndex++) {
+                const infraccionActual = usuarioHistorial.getInfracciones()[infIndex]
+
+                puntosLicencia -= infraccionActual.getTipo().getPuntos()
+            }
+
+            const conductorActual = new conductor(idConductor, usuarioNombre, usuarioNacimiento, usuarioVehiculos, puntosLicencia, usuarioHistorial)
+
+            conductores.push(conductorActual)
+        }
+
+        console.log(conductores)
+
+
+
+
+
+        //----------Mostrar usuarios
+        document.write("<h1>Conductores</h1>")
+        document.write("<ul>")
+
+            conductores.forEach(conductor => {
+                document.write("<li>ID: "+conductor.getId()+", Nombre: "+conductor.getNombre()+"</li>")
+
+                document.write("<li>Nacimiento: "+conductor.getNacimiento()+"</li>")
+                document.write("<li>Puntos restantes: "+conductor.getPuntos()+"</li>")
+                document.write("<li>Vehiculos:</li>")
+
+                //Vehiculos del conductor
+                document.write("<ul>")
+                    
+                    conductor.getVehiculos().forEach(vehiculo => {
+                        document.write("<li>"+vehiculo.getMarca().getNombre()+", ("+vehiculo.getModelo().getNombre()+")</li>")
+                    })
+
+                document.write("</ul>")
+
+                //Infracciones
+                document.write("<li>Vehiculos:</li>")
+
+                document.write("<ul>")
+
+                    conductor.getHistorial().getInfracciones().forEach(infraccion => {
+                        document.write("<li>"+infraccion.getTipo().getNombre()+"</li>")
+
+                        //Datos de la infraccion
+                        document.write("<ul>")
+                            document.write("<li>Perdida de puntos: "+infraccion.getTipo().getPuntos()+"</li>")
+                            document.write("<li>Coste inicial: "+infraccion.getTipo().getMonto()+"€</li>")
+                            document.write("<li>Descuento aplicado: "+(infraccion.getDescuento()*100)+"%</li>")
+                            document.write("<li>Coste final: "+infraccion.getMontoFinal()+"€</li>")
+                        document.write("</ul>")
+                    })
+
+                document.write("</ul>")
+
+                document.write("<li></li>")
+                document.write("<li></li>")
+                document.write("<li></li>")
+            })
+
+        document.write("</ul>")
+        
+    </script>
+</body>
+</html>

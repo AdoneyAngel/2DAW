@@ -334,3 +334,100 @@
 
 
 <router-outlet />
+<h1>Usuarios:</h1>
+<ul>
+  @for (usuario of usuarios; track $index) {
+    <li>Usuario: {{usuario.getNombre()}}</li>
+    <ul>
+      <li>ID: {{usuario.getId()}}</li>
+      <li>Fecha de nacimiento: {{usuario.getNacimiento()}}</li>
+      <li>Direcciones:</li>
+      <ul>
+        @for (direccion of usuario.getDireccion().getDirecciones(); track $index) {
+          <li>Pais: {{direccion.getPais().getNombre()}}, Ciudad: {{direccion.getCiudad().getNombre()}}</li>
+        }
+      </ul>
+      <li>Historial de compras:</li>
+      <ul>
+        @for (compra of usuario.getHistorial().getCompras(); track $index) {
+          <li>{{compra.getProducto().getNombre()}}</li>
+          <ul>
+            <li>Precio inicial: {{compra.getProducto().getPrecioInicial()}}€</li>
+            <li>Fecha: {{compra.getFecha()}}</li>
+            <li>Estado: {{compra.getEstado()}}</li>
+            <li>Descuento: {{compra.getDescuento()*100}}%</li>
+            <li>Precio final: {{compra.getPrecioFinal()}}€</li>
+          </ul>
+        }
+      </ul>
+    </ul>
+  }
+</ul>
+
+<!-- #####FILTROS##### -->
+<!-- ###Cumpleaños### -->
+<h1>Filtro cumpleaños:</h1>
+<ul>
+  @for (usuario of this.filtroCumple; track $index) {
+    <li>{{usuario.getNombre()}}:</li>
+    <li>Fecha de nacimiento: {{usuario.getNacimiento()}}</li>
+  }
+</ul>
+
+<!-- ###Rango de edad### -->
+<h1>Filtro por rango de edad: {{minEdadFiltro}}-{{maxEdadFiltro}}</h1>
+<ul>
+  @for (usuario of this.filtroEdad; track $index) {
+    <li>{{usuario.getNombre()}}:</li>
+    <ul>
+      <li>Fecha de nacimiento: {{usuario.getNacimiento()}}</li>
+      <li>Edad: {{usuario.getEdad()}} años</li>
+    </ul>
+  }
+</ul>
+
+<!-- ###Ciudad### -->
+<h1>Filtro por ciudad: {{ciudadFiltro.getNombre()}}</h1>
+<ul>
+  @for (usuario of this.filtroCiudad; track $index) {
+    <li>{{usuario.getNombre()}}:</li>
+    <li>Direcciones:</li>
+    <ul>
+      @for (direccion of usuario.getDireccion().getDirecciones(); track $index) {
+        <li>Pais: {{direccion.getPais().getNombre()}}, Ciudad: {{direccion.getCiudad().getNombre()}}</li>
+      }
+    </ul>
+  }
+</ul>
+
+<!-- ###Fecha de compra### -->
+<h1>Filtro por fecha de compra: {{fechaCompraFiltro}}</h1>
+<ul>
+  @for (usuario of this.filtroCompra; track $index) {
+    <li>{{usuario.getNombre()}}:</li>
+    <ul>
+      @for (compra of usuario.getHistorial().getCompras(); track $index) {
+        <li>{{compra.getProducto().getNombre()}}: {{compra.getFecha()}}</li>
+      }
+    </ul>
+  }
+</ul>
+
+
+
+<!-- #####REPORTES##### -->
+<!-- ###Reporte de coste total de compras### -->
+<h1>Reporte de compras de usuario de ID: {{idUsuarioReporte}}</h1>
+<p>Coste total de compras: {{reporteCompras}}€</p>
+
+
+<!-- ###Productos comprados por los ususarios### -->
+<h1>Productos comprados por los usuarios:</h1>
+<ul>
+  @for (producto of this.productosComprados; track $index) {
+    <li>{{producto.getNombre()}}</li>
+  }
+</ul>
+
+<h1>Usuarios JSON:</h1>
+<p>{{usuariosJSON}}</p>

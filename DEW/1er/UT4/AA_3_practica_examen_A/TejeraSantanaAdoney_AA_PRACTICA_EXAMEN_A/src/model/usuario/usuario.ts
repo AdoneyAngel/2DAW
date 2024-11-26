@@ -8,6 +8,7 @@ export class Usuario {
   #nacimiento: Date
   #direccion: Direcciones
   #historial: HistorialCompras
+  #edad:number
 
   constructor (id: number, nombre: string, nacimiento: Date = new Date(), direccion: Direcciones, historial: HistorialCompras) {
     this.#id = id
@@ -15,6 +16,10 @@ export class Usuario {
     this.#nacimiento = nacimiento
     this.#direccion = direccion
     this.#historial = historial
+
+    //Calcular edad
+    const fechaActual = new Date()
+    this.#edad = Math.round((fechaActual.getTime()-nacimiento.getTime())/(1000*60*60*24*365))
   }
 
   getId() {
@@ -31,6 +36,9 @@ export class Usuario {
   }
   getHistorial() {
     return this.#historial
+  }
+  getEdad() {
+    return this.#edad
   }
 
   genRandom() {

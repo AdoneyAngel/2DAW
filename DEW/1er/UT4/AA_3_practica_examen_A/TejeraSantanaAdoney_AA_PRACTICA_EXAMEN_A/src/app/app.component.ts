@@ -20,6 +20,25 @@ export class AppComponent {
   title = 'TejeraSantanaAdoney_AA_PRACTICA_EXAMEN_A';
   usuarios:Usuario[] = []
 
+  filtroCumple:Usuario[] = []
+
+  filtroEdad:Usuario[] = []
+  minEdadFiltro:number = 18
+  maxEdadFiltro:number = 30
+
+  filtroCiudad:Usuario[] = []
+  ciudadFiltro:Ciudad = new Ciudad("Madrid")
+
+  filtroCompra:Usuario[] = []
+  fechaCompraFiltro:Date = new Date("11-19-2024")
+
+  reporteCompras:number = 0
+  idUsuarioReporte:number = 1
+
+  productosComprados:Producto[] = []
+
+  usuariosJSON:string = ""
+
   ngOnInit() {//Se ejecuta la funcion nada mas comenzar
     this.flujo()
   }
@@ -53,7 +72,7 @@ export class AppComponent {
     const productoPapas = new Producto("Papas", 2)
     const productoRefresco = new Producto("CocaCola", 1.7)
     const productoTV = new Producto("TV", 700)
-    const productoMartin = new Producto("Aston Martin", 700)
+    const productoMartin = new Producto("Aston Martin", 50000)
 
     //---------Estados validos para producto
     const estadosProducto = ["Pendiente", "En Proceso", "Completado"]
@@ -62,7 +81,7 @@ export class AppComponent {
 
     //---------Variables constantes para aleatoriedad de los usuarios
     const diasRestarNacimiento = (365*65)
-    const diasRestarCompra = 30
+    const diasRestarCompra = 10
     const maxDirecciones = 3
     const minDirecciones = 1
     const minCompras = 0
@@ -73,14 +92,14 @@ export class AppComponent {
     for(let IdUsuario = 0; IdUsuario<numUsuarios; IdUsuario++) {
       const nombreUsuario = "Usuario "+IdUsuario
       let fechaNacimiento = new Date()
-      fechaNacimiento.setDate(fechaNacimiento.getDate()-(Math.random()*diasRestarNacimiento))
+      fechaNacimiento.setDate(fechaNacimiento.getDate()-(Math.round(Math.random()*diasRestarNacimiento)))
 
       let direcciones = new Direcciones([]);
 
       //Generar direcciones
       const nDirecciones = Math.random()*(maxDirecciones-minDirecciones)+minDirecciones
       for(let index = 0; index<nDirecciones; index++) {
-        const paisPosicion = Math.round(Math.random()*ubicaciones.length)
+        const paisPosicion = Math.round(Math.random()*(ubicaciones.length-1))
         const paisActual = ubicaciones[paisPosicion]
 
         let direccionActual = new Direccion(paisActual)//El modelo, si no se le pasa la ciudad, elige una aleatoria del pais
@@ -89,7 +108,7 @@ export class AppComponent {
       }
 
       //Se establece la direccion elegida como principal
-      const direccionElegidaPos = Math.round(Math.random()*direcciones.getDirecciones().length)
+      const direccionElegidaPos = Math.round(Math.random()*(direcciones.getDirecciones().length-1))
       const direccionElegida = direcciones.getDirecciones()[direccionElegidaPos]
 
       direcciones.setDireccionElegida(direccionElegida)
@@ -99,14 +118,14 @@ export class AppComponent {
       const nCompras = Math.random()*(maxCompras-minCompras)+minCompras
 
       for (let compraIndex = 0; compraIndex<nCompras; compraIndex++) {
-        const productoPos = Math.round(Math.random()*productos.length)
-        const estadoPos = Math.round(Math.random()*estadosProducto.length)
+        const productoPos = Math.round(Math.random()*(productos.length-1))
+        const estadoPos = Math.round(Math.random()*(estadosProducto.length-1))
 
         const productoActual = productos[productoPos]
         const estadoProducto = estadosProducto[estadoPos]
 
         let fechaCompra = new Date()
-        fechaCompra.setDate(fechaCompra.getDate()-diasRestarCompra)
+        fechaCompra.setDate(fechaCompra.getDate()-(Math.random()*diasRestarCompra))
 
         const compraActual = new Compra(productoActual, fechaCompra, estadoProducto)
 
@@ -142,6 +161,72 @@ export class AppComponent {
       this.usuarios.push(usuarioActual)
     }
 
-    console.log(this.usuarios)
+    //Se guarda los usuarios en formato JSON
+    this.usuariosJSON = JSON.stringify(this.usuarios)
+
+    //----------FILTROS
+    const fechaActual = new Date()
+    //----Cumpleaños
+    for (const usuario of this.usuarios) {
+
+      if (usuario.getNacimiento().getDate() == fechaActual.getDate() && usuario.getNacimiento().getMonth() == fechaActual.getMonth()) {
+        this.filtroCumple.push(usuario)
+      }
+    }
+
+    //----Rango de edad
+    for (const usuario of this.usuarios) {
+
+      if (usuario.getEdad() >= this.minEdadFiltro && usuario.getEdad() <= this.maxEdadFiltro) {
+        this.filtroEdad.push(usuario)
+      }
+    }
+
+    //----Ciudad
+    for (const usuario of this.usuarios) {
+      let estaEnCiudad = false
+
+      for (const direccion of usuario.getDireccion().getDirecciones()) {
+        if (direccion.getCiudad().getNombre() == this.ciudadFiltro.getNombre()) {
+          estaEnCiudad = true
+        }
+      }
+
+      if (estaEnCiudad) {
+        this.filtroCiudad.push(usuario)
+      }
+    }
+
+    //----Fecha de compra
+    for (const usuario of this.usuarios) {
+      let hizoCompra = false
+
+      for (const compra of usuario.getHistorial().getCompras()) {
+        if (compra.getFecha().getMonth() == this.fechaCompraFiltro.getMonth() && compra.getFecha().getDate() == this.fechaCompraFiltro.getDate() && compra.getFecha().getFullYear() == this.fechaCompraFiltro.getFullYear()) {
+          hizoCompra = true
+        }
+      }
+
+      if (hizoCompra) {
+        this.filtroCompra.push(usuario)
+      }
+    }
+
+    //----------REPORTES
+    //----Reporte de compras
+    for(const usuario of this.usuarios) {
+      if (usuario.getId() == this.idUsuarioReporte) {
+        this.reporteCompras = usuario.getHistorial().getReporteTotal()
+      }
+    }
+
+    //---Compras realizadas por todos los usuarios sin duplicación
+    for (const usuario of this.usuarios) {
+      for (const compra of usuario.getHistorial().getCompras()) {
+        if (!this.productosComprados.includes(compra.getProducto())) {
+          this.productosComprados.push(compra.getProducto())
+        }
+      }
+    }
   }
 }

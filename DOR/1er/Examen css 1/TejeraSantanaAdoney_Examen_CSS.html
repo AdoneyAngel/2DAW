@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tejera Santana Adoney</title>
+    <style>
+
+        body {
+            border: 5px solid #dfdfdf;
+            padding: 50px 30px;
+        }
+        #bienvenida {
+            width: 90%;
+            padding: 10px 0;
+            border: 2px solid black;
+            border-radius: 10px;
+            display: block;
+            margin: auto;
+            text-align: center;
+            animation: bienvenidaAni 4s ease-in-out infinite;
+        }
+        #frasePrincipal {
+            font-weight: bold;
+            display: block;
+            margin: 10px auto;
+            width: 90%;
+            height: 30px;
+            text-align: center;
+            color: red;
+            background: linear-gradient(90deg, black 50%, yellow 50%);
+            background-size: 2%;
+            border: 2px dashed black;
+            border-radius: 10px;
+            padding: 10px 0;
+            transition: .5s linear;
+        }
+        #frasePrincipal:hover {
+            font-size: 3em;
+        }
+        #caja {
+            background: orange;
+            padding: 20px;
+        }
+        #subtitulo {
+            color: darkblue;
+        }
+        .informativo1 {
+            padding: 5px;
+            border: 2px dotted blue;
+            border-radius: 10px;
+        }
+        .informativo2 {
+            padding: 10px;
+            text-align: right;
+            border-left: 2px solid blue;
+            border-right: 2px solid blue;
+            border-bottom: 2px dashed blue;
+            border-top: 2px dashed blue;
+            border-radius: 10px;
+        }
+        .btnPrincipal {
+            background: linear-gradient(90deg, green, cyan, green);
+            padding: 10px;
+            border-radius: 5px;
+            display: block;
+            margin: auto;
+            background-size: 200%;
+        }
+        .btnPrincipal:hover {
+            animation: principalAni 2s ease-in-out;
+        }
+        #botones {
+            margin-top: 10px;
+        }
+        #botones button{
+            position: absolute;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+        #botones > .izquierdo {
+            background: grey;
+            left: 40px;
+        }
+        #botones > .central {
+            background: red;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: .5s;
+        }
+        #botones > .derecho {
+            background: grey;
+            right: 40px;
+        }
+
+        #botones > .central:hover {
+            background: green;
+            transform: translateX(-50%) scale(1.1);
+            transform-origin: center;
+        }
+
+        @keyframes principalAni {
+            0% {
+                background-position: 0%;
+            }
+            100% {
+                background-position: 400%;
+            }
+        }
+
+        @keyframes bienvenidaAni {
+            0% {
+                background: blue;
+            }
+            50% {
+                background: green;
+            }
+            100% {
+                background: yellow;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <h1 id="bienvenida">Bienvenido a mi página de CSS</h1>
+    <h2 id="frasePrincipal">Examen de CSS básico</h2>
+
+    <div id="caja">
+        <h2 id="subtitulo">Subtitulo de muestra</h2>
+        <p class="informativo1">Texto informativo 1</p>
+        <p class="informativo2">Texto informativo 2</p>
+
+        <button class="btnPrincipal">Principal</button>
+    </div>
+
+    <section id="botones">
+        <button class="izquierdo">Boton izquierdo</button>
+        <button class="central">Boton central</button>
+        <button class="derecho">Boton derecho</button>
+    </section>
+</body>
+</html>

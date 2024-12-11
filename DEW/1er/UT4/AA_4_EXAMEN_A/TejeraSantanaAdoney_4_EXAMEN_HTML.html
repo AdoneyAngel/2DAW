@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4 EXAMEN</title>
+</head>
+<body>
+    
+    <script>
+
+        //Definición de clases
+        class estudiante {
+            id
+            nombre
+            nacimiento
+            matriculas
+
+            constructor (id, nombre, nacimiento, matriculas = []) {
+                this.id = id
+                this.nombre = nombre
+                this.nacimiento = nacimiento
+                this.matriculas = matriculas
+            }
+
+            getId() {
+                return this.id
+            }
+            getNombre() {
+                return this.nombre
+            }
+            getNacimiento() {
+                return this.nacimiento
+            }
+            getMatriculas() {
+                return this.matriculas
+            }
+
+            
+        }
+
+        class docente {
+            id
+            nombre
+
+            constructor (id, nombre) {
+                this.id = id
+                this.nombre = nombre
+            }
+            
+            getId() {
+                return this.id
+            }
+            getNombre() {
+                return this.nombre
+            }
+        }
+
+        class aula {
+            numero
+            piso 
+            edificio
+
+            constructor (numero, piso, edificio) {
+                this.numero = numero 
+                this.piso = piso
+                this.edificio = edificio
+            }
+
+            getNumero() {
+                return this.numero
+            }
+            getPiso() {
+                return this.piso
+            }
+            getEdificio() {
+                return this.edificio
+            }
+        }
+
+        class asignatura {
+            id
+            nombre
+            horas
+            costoPorHora
+            costoFinal
+            docente
+            lugar
+
+            constructor (id, nombre, horas, costoPorHora, docente, lugar) {
+                this.id = id
+                this.nombre = nombre
+                this.horas = horas
+                this.costoPorHora = costoPorHora
+                this.costoFinal = costoPorHora*horas
+                this.docente = docente
+                this.lugar = lugar
+            }
+
+            getId() {
+                return this.id
+            }
+            getNombre() {
+                return this.nombre
+            }
+            getHoras() {
+                return this.horas
+            }
+            getCostoPorHora() {
+                return this.costoPorHora
+            }
+            getDocente() {
+                return this.docente
+            }
+            getLugar() {
+                return this.lugar
+            }
+
+            getCostoFinal() {
+                return this.costoFinal
+            }
+            setCostoFinal(costo) {
+                this.costoFinal = costo
+            }
+        }
+
+        class matricula {
+            id
+            estado 
+            asignaturas
+            fecha
+
+            constructor (id, estado, asignaturas = [], fecha) {
+                this.id = id
+                this.estado = estado
+                this.asignaturas = asignaturas
+                this.fecha = fecha
+            }
+
+            getId() {
+                return this.id
+            }
+            getEstado() {
+                return this.estado
+            }
+            getFecha() {
+                return this.fecha
+            }
+            getAsignaturas() {
+                return this.asignaturas
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+        //Objetos predefinidos
+        const nombreAlumnos = ["Jose Fernandez Aragón", "Frank Coco piña", "Aitor Velazques Tierra", "Carlos Santos Péres", "Abcd fj hi"]
+
+        const profeChan = new docente(0, "Chan jo")
+        const profeJoy = new docente(1, "Joy con")
+        const profeSiur = new docente(2, "Siur fan")
+        const profe$ = new docente(3, "€$@")
+        const profeAntonio = new docente(4, "Antonio José")
+
+        const docentes = [profeChan, profeJoy, profeSiur, profe$, profeAntonio]
+
+        //Aulas
+        const pisos = ["Principal", "Primero", "Último"]
+        const edificios = ["Grande", "Pequeño", "El de al lado"]
+        let aulas = []
+
+        for (let index = 0; index<5; index++) {
+            const pisoActual = pisos[Math.round(Math.random()*(pisos.length-1))]
+            const edificioActual = pisos[Math.round(Math.random()*(edificios.length-1))]
+            const aulaActual = new aula(index, pisoActual, edificioActual)
+
+            aulas.push(aulaActual)
+        }
+
+        //Asignaturas
+        const asBaseDatos = new asignatura(0, "Base de datos", 150, 1, docentes[Math.round(Math.random()*(docentes.length-1))], aulas[Math.round(Math.random()*(aulas.length-1))])
+        const asLenguaje = new asignatura(1, "Lenguaje de marcas", 100, 1.5, docentes[Math.round(Math.random()*(docentes.length-1))], aulas[Math.round(Math.random()*(aulas.length-1))])
+        const asProgramacion = new asignatura(2, "Programacion", 200, 2, docentes[Math.round(Math.random()*(docentes.length-1))], aulas[Math.round(Math.random()*(aulas.length-1))])
+        const asEnt = new asignatura(3, "Entorno de desarrollo", 90, .4, docentes[Math.round(Math.random()*(docentes.length-1))], aulas[Math.round(Math.random()*(aulas.length-1))])
+        const asBalé = new asignatura(4, "Balé", 30, .2, docentes[Math.round(Math.random()*(docentes.length-1))], aulas[Math.round(Math.random()*(aulas.length-1))])
+        const asSistemas = new asignatura(5, "Sistemas informáticos", 130, .5, docentes[Math.round(Math.random()*(docentes.length-1))], aulas[Math.round(Math.random()*(aulas.length-1))])
+        const asDespliegue = new asignatura(6, "Despliegue de aplicaciones web", 105, .65, docentes[Math.round(Math.random()*(docentes.length-1))], aulas[Math.round(Math.random()*(aulas.length-1))])
+        const asDesarrolloCliente = new asignatura(7, "Desarrollo de aplicaciones en entorno cliente", 125, .9, docentes[Math.round(Math.random()*(docentes.length-1))], aulas[Math.round(Math.random()*(aulas.length-1))])
+        const asDesarrolloServidor = new asignatura(8, "Desarrollo de aplicaciones en entorno servidor", 125, .9, docentes[Math.round(Math.random()*(docentes.length-1))], aulas[Math.round(Math.random()*(aulas.length-1))])
+        const asEMR = new asignatura(9, "Algo de empresa", 30, .3, docentes[Math.round(Math.random()*(docentes.length-1))], aulas[Math.round(Math.random()*(aulas.length-1))])
+        const asEng = new asignatura(10, "Inglés", 135, .55, docentes[Math.round(Math.random()*(docentes.length-1))], aulas[Math.round(Math.random()*(aulas.length-1))])
+        
+        const asignaturas = [asBaseDatos, asLenguaje, asProgramacion, asEnt, asBalé, asSistemas, asDespliegue, asDesarrolloCliente, asDesarrolloServidor, asEMR]
+
+        //Estados de matriculas
+        const estadosMatricula = ["Pendiente", "En proceso", "Completado"]
+
+
+
+
+
+
+
+        //Variables constantes para aleatoriedad
+        const nEstudiantes = 3
+        const restarDiasNacimiento = 5
+        const restarDiasMatricula = 5
+        const nMatriculas = 2
+        const nAsignaturas = 4
+        const descuentoRepetidor = .2
+
+
+
+
+
+
+
+        //--------------Generar alumnos
+        let estudiantes = []
+
+        for (let idEstudiante = 0; idEstudiante<nEstudiantes; idEstudiante++) {
+            //Nombre
+            const estudianteNombre = nombreAlumnos[Math.round(Math.random()*(nombreAlumnos.length-1))]
+
+            //Nacimiento
+            let estudianteNacimiento = new Date()
+            estudianteNacimiento.setDate(estudianteNacimiento.getDate()-(Math.round(Math.random()*restarDiasNacimiento)))
+
+            //matriculas
+            estudianteMatriculas = []
+            for(let indexMatricula = 0; indexMatricula<nMatriculas; indexMatricula++) {
+                const matriculaId = indexMatricula+idEstudiante
+
+                //Estado
+                const estadoMatricula = estadosMatricula[Math.round(Math.random()*(estadosMatricula.length-1))]
+
+                //Asignaturas
+                let matriculaAsignaturas = []
+                for (let indexAsignatura = 0; indexAsignatura<nAsignaturas; indexAsignatura++) {
+                    let asignaturaActual = asignaturas[Math.round(Math.random()*(asignaturas.length-1))]
+
+                    //Se aplica el descuento si ya ha cursado la asignatura anteriormente
+                    matriculaAsignaturas.forEach(asignaturaActual2 => {
+                        if (asignaturaActual2.getId() == asignaturaActual.getId()) {
+                            const costeOriginal = asignaturaActual.getCostoPorHora()*asignaturaActual.getHoras()
+                            const nuevoCoste = costeOriginal-((asignaturaActual.getCostoPorHora()*asignaturaActual.getHoras())*descuentoRepetidor)
+                            asignaturaActual.setCostoFinal(nuevoCoste)
+                        }
+                    })
+
+                    matriculaAsignaturas.push(asignaturaActual)
+                }
+
+                //Fecha
+                let matriculaFecha = new Date()
+                matriculaFecha.setDate(matriculaFecha.getDate()-(Math.round(Math.random()*restarDiasMatricula)))
+
+                const matriculaActual = new matricula(matriculaId, estadoMatricula, matriculaAsignaturas, matriculaFecha)
+
+                estudianteMatriculas.push(matriculaActual)
+
+            }
+
+            const estudianteActual = new estudiante(idEstudiante, estudianteNombre, estudianteNacimiento, estudianteMatriculas)
+
+            estudiantes.push(estudianteActual)
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        //--------------Filtrar Estudiante
+        //-------Identidad
+        const identidad = 2
+        let filtroIdentidad
+
+        for(let estudianteActual of estudiantes) {
+            if (estudianteActual.getId() == identidad) {
+                filtroIdentidad = estudianteActual
+            }
+        }
+
+        //-------Nacimiento
+        const nacimientofiltrar = new Date("2024-11-23")
+        const filtroNacimiento = estudiantes.filter(estudianteActual => estudianteActual.getNacimiento().getMonth() == nacimientofiltrar.getMonth() && estudianteActual.getNacimiento().getDate()  == nacimientofiltrar.getDate() && estudianteActual.getNacimiento().getFullYear() == nacimientofiltrar.getFullYear())
+
+        //-------Fecha matricula
+        let fechaMatricula = new Date("2024-11-23")
+
+        let filtroFechaMatricula = []
+
+        for (let estudianteActual of estudiantes) {
+            let matriculaEnFecha = false
+
+            estudianteActual.getMatriculas().forEach(matricula => {
+                if (matricula.getFecha().getMonth() == fechaMatricula.getMonth() && matricula.getFecha().getDate()  == fechaMatricula.getDate() && matricula.getFecha().getFullYear() == fechaMatricula.getFullYear()) {
+                    matriculaEnFecha = true
+                }
+            })
+
+            if (matriculaEnFecha) {
+                filtroFechaMatricula.push(estudianteActual)
+            }
+        }
+
+        
+
+
+
+        
+        //--------------Generar reportes
+        //-------Total de matrícula de estudiante
+        const idAlumnoReporte = 1
+        let costeDeMatriculaAlumno = 0
+
+        estudiantes.forEach(estudianteActual => {
+            if (estudianteActual.getId() == idAlumnoReporte) {
+                
+                estudianteActual.getMatriculas().forEach(matriculaActual => {
+
+                    matriculaActual.getAsignaturas().forEach(asignaturaActual => {
+                        costeDeMatriculaAlumno += asignaturaActual.getCostoFinal()
+                    })
+                })
+            }
+        })
+        
+        //-------Asignaturas cursadas
+        let asignaturasCursadasReporte = []
+
+        estudiantes.forEach(estudianteActual => {
+            estudianteActual.getMatriculas().forEach(matriculaActual => {
+                matriculaActual.getAsignaturas().forEach(asignaturaActual => {
+                    //Buscar que la asignatura no esté repetida
+                    let repetido = false
+
+                    asignaturasCursadasReporte.forEach(asignaturaCursada => {
+                        if (asignaturaCursada.getId() == asignaturaActual.getId()) {
+                            repetido = true
+                        }
+                    })
+
+                    if (!repetido) {
+                        asignaturasCursadasReporte.push(asignaturaActual)
+                    }
+                })
+            })
+        })
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Mostrar datos -->
+     <script>
+
+        document.write("<h1>###########################Estudiantes###########################</h1>")
+        document.write("<ul>")
+            estudiantes.forEach(estudianteActual => {
+                document.write("<li>ID: "+estudianteActual.getId()+"</li>")
+
+                document.write("<ul>")
+                    document.write("<li>Nombre: "+estudianteActual.getNombre()+"</li>")
+                    document.write("<li>Fecha de nacimiento: "+estudianteActual.getNacimiento()+"</li>")
+                    document.write("<li>Matriculas:</li>")
+
+                    //Matriculas del estudiante
+                    document.write("<ul>")
+                        estudianteActual.getMatriculas().forEach(matriculaActual => {
+                            document.write("<li>ID matricula: "+matriculaActual.getId()+"</li>")
+
+                            //Datos de la matricula
+                            document.write("<ul>")
+                                document.write("<li>Estado: "+matriculaActual.getEstado()+"</li>")
+                                document.write("<li>Fecha de matrícula: "+matriculaActual.getFecha()+"</li>")
+                                document.write("<li>Asignaturas:</li>")
+
+                                //Asignaturas de la matrícula
+                                document.write("<ul>")
+                                    matriculaActual.getAsignaturas().forEach(asignaturaActual => {
+                                        document.write("<li>ID asignatura: "+asignaturaActual.getId()+"</li>")
+
+                                        //Datos de la asignatura
+                                        document.write("<ul>")
+                                            document.write("<li>Nombre: "+asignaturaActual.getNombre()+"</li>")
+                                            document.write("<li>Costo por hora: "+asignaturaActual.getCostoPorHora()+"€</li>")
+                                            document.write("<li>Horas lectivas: "+asignaturaActual.getHoras()+"h</li>")
+                                            document.write("<li>Costo final: "+asignaturaActual.getCostoFinal()+"€</li>")
+                                            document.write("<li>Docente: ("+asignaturaActual.getDocente().getId()+")"+asignaturaActual.getDocente().getNombre()+"</li>")
+                                            document.write("<li>Aula ("+asignaturaActual.getLugar().getNumero()+"): [Edificio:"+asignaturaActual.getLugar().getEdificio()+", Piso:"+asignaturaActual.getLugar().getPiso()+"]")
+                                        document.write("</ul>")
+                                    })
+                                document.write("</ul>")
+                            document.write("</ul>")
+                        })
+                    document.write("</ul>")
+                document.write("</ul>")
+            })
+        document.write("</ul>")
+
+        document.write("<h1>###########################Filtros###########################</h1>")
+        document.write("<h1>------------Identidad: "+identidad+"------------<h1>")
+        document.write("<h2>-Estudiante: "+filtroIdentidad.getNombre()+"</h2>")
+        document.write("<h2>-ID: "+filtroIdentidad.getId()+"</h2>")
+        
+        document.write("<h1>------------Nacimiento: "+nacimientofiltrar+"------------</h1>")
+        document.write("<ul>")
+            filtroNacimiento.forEach(estudianteActual => {
+                document.write("<li>Estudiante: "+estudianteActual.getNombre()+"</li>")
+                document.write("<ul><li>Nacido en: "+estudianteActual.getNacimiento()+"</li></ul>")
+            })
+        document.write("</ul>")
+        
+        document.write("<h1>------------Fecha de matrícula: "+fechaMatricula+"------------</h1>")
+        document.write("<ul>")
+            filtroFechaMatricula.forEach(estudianteActual => {
+                document.write("<li>Estudiante: "+estudianteActual.getNombre()+"</li>")
+
+                document.write("<ul>")
+                    document.write("<li>Matrículas coincidentes:</li>")
+
+                    //Mostrar matrículas que coinciden con la fecha filtrada
+                    document.write("<ul>")
+                        estudianteActual.getMatriculas().forEach(matricula => {
+                            if (matricula.getFecha().getMonth() == fechaMatricula.getMonth() && matricula.getFecha().getDate()  == fechaMatricula.getDate() && matricula.getFecha().getFullYear() == fechaMatricula.getFullYear()) {
+                                document.write("<li>ID matrícula: "+matricula.getId()+"</li>")
+                                document.write("<li>Fecha: "+matricula.getFecha()+"</li>")
+                            }
+                        })
+                    document.write("</ul>")                    
+                document.write("</ul>")
+
+            })
+        document.write("</ul>")
+        
+        document.write("<h1>###########################Reportes###########################</h1>")
+        document.write("<h1>------------Coste de matrículas: Estudiante "+idAlumnoReporte+"------------<h1>")
+        document.write("<h2>Coste total: "+costeDeMatriculaAlumno+"€</h2>")
+        
+        document.write("<h1>------------Asignaturas cursadas------------<h1>")
+        document.write("<ul>")
+            asignaturasCursadasReporte.forEach(asignaturaActual => {
+                document.write("<li>"+asignaturaActual.getNombre()+"</li>")
+            })
+        document.write("</ul>")
+     </script>
+
+</body>
+</html>

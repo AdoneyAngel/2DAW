@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen práctico ut5</title>
+    <style>
+        * {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        #seccion {
+            border: 2px solid #dfdfdf;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 15px;
+        }
+        button {
+            display: block;
+            background-color: green;
+            width: 100%;
+            padding: 10px 0;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            filter: brightness(.9);
+        }
+        input {
+            border: 2px solid #d3d3d3;
+            
+        }
+    </style>
+</head>
+<body>
+    <form id="form" action="">
+        <section id="seccion">
+            <h1>Datos de libro</h1>
+            <h3>ISBN:</h3>
+            <input type="text" id="isbn">
+            <p class="error" id="isbnError"></p>
+    
+            <h3>Título:</h3>
+            <input type="text" id="titulo">
+            <p class="error" id="tituloError"></p>
+    
+            <h3>Fecha lanzamiento:</h3>
+            <input type="date" id="fecha">
+            <p class="error" id="fechaError"></p>
+
+            <h3>BlackFriday:</h3>
+            <input type="checkbox" id="blackfriday">
+        </section>
+        
+        <section id="seccion">
+            <h1>Detalles del autor</h1>
+
+            <h3>Nombre Completo del autor:</h3>
+            <input type="text" id="autor">
+            <p id="autorError"></p>
+        </section>
+
+        <section id="seccion">
+            <h1>Detalles del libro</h1>
+
+            <h3>Género:</h3>
+            <select name="genero" id="genero">
+            <p class="error" id="generoError"></p>
+
+            </select>
+
+            <h3>Precio (en EUROS):</h3>
+            <input type="number" id="precio">
+            <p class="error" id="precioError"></p>
+
+            <h3>Tipo de Descuento:</h3>
+            <select name="descuento" id="descuento" disabled>
+
+            </select>
+
+            <h3>Precio final (en EUROS):</h3>
+            <input type="number" id="precioFinal" disabled>
+            <p class="error" id="precioFinalError"></p>
+
+        </section>
+
+        <button>Registrar</button>
+
+    </form>
+
+
+    <br><br><br>
+
+
+    <table id="tabla">
+        <thead>
+            <tr>
+                <th>ISBN</th>
+                <th>Nombre</th>
+                <th>Género</th>
+                <th>Precio</th>
+                <th>Descuento</th>
+                <th>PrecioFinal</th>
+                <th>Nombre Autor</th>
+            </tr>
+        </thead>
+        <tbody id="tbody">
+
+        </tbody>
+    </table>
+
+
+
+
+    <script src="./Registro.js"></script>
+    <script src="./Genero.js"></script>
+    <script src="./Autor.js"></script>
+    <script src="./Libro.js"></script>
+    <script src="./Principal.js"></script>
+</body>
+</html>

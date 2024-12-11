@@ -1,3 +1,5 @@
 #Maquinas virtuales
 **/*.vdi
 **/*.vbox-prev
+**/*.zip
+*.zip

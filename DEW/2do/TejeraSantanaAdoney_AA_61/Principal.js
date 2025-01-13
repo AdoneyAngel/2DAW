@@ -19,6 +19,10 @@ const banco = new Banco(cajas)
 
 
 
+
+
+
+
 //--------------------------Generar vista
 const tituloFormulario = document.createElement("h1")
 const formulario = document.createElement("div")
@@ -79,11 +83,14 @@ formulario.appendChild(btnAñadirRegistro)
 
 document.body.appendChild(formulario)
 
-//------------Tabla
 const tituloTabla = document.createElement("h1")
 const seccionBanco = document.createElement("section")
 const tabla = document.createElement("table")
-const thTabla = document.createElement("th")
+const thTablaId = document.createElement("th")
+const thTablaFecha = document.createElement("th")
+const thTablaConcepto = document.createElement("th")
+const thTablaCuantia = document.createElement("th")
+const thTablaAcciones = document.createElement("th")
 const trTabla = document.createElement("tr")
 const theadTabla = document.createElement("thead")
 const tbodyTabla = document.createElement("tbody")
@@ -94,11 +101,12 @@ const btnResetearFiltro = document.createElement("button")
 const btnFiltro = document.createElement("button")
 const optionTodos = document.createElement("option")
 
+//Filtros
 btnFiltro.innerHTML = "Filtrar"
 btnResetearFiltro.innerHTML = "Resetear"
 
-btnFiltro.addEventListener("click", cargarTabla)
-btnResetearFiltro.addEventListener("click", resetearTabla)
+btnFiltro.addEventListener("click", cargarTablaFiltro)
+btnResetearFiltro.addEventListener("click", () => {resetearTabla(); resetearFormulario();})
 
 tituloTabla.textContent = "Filtro Registro"
 seccionBanco.appendChild(tituloTabla)
@@ -135,19 +143,29 @@ seccionBanco.appendChild(inputCajaFiltro)
 seccionBanco.appendChild(btnFiltro)
 seccionBanco.appendChild(btnResetearFiltro)
 
-thTabla.innerHTML = "ID"
-trTabla.appendChild(thTabla.cloneNode(true))
+//Tabla
+thTablaId.innerHTML = "ID"
+thTablaId.addEventListener("click", cargarTablaOrdenId)
+thTablaId.style.cursor = "pointer"
+trTabla.appendChild(thTablaId)
 
-thTabla.innerHTML = "Fecha"
-trTabla.appendChild(thTabla.cloneNode(true))
+thTablaFecha.innerHTML = "Fecha"
+thTablaFecha.addEventListener("click", cargarTablaOrdenFecha)
+thTablaFecha.style.cursor = "pointer"
+trTabla.appendChild(thTablaFecha)
 
-thTabla.innerHTML = "Concepto"
-trTabla.appendChild(thTabla.cloneNode(true))
+thTablaConcepto.innerHTML = "Concepto"
+trTabla.appendChild(thTablaConcepto)
 
-thTabla.innerHTML = "Cuantía"
-trTabla.appendChild(thTabla.cloneNode(true))
+thTablaCuantia.innerHTML = "Cuantía"
+thTablaCuantia.addEventListener("click", cargarTablaOrdenCuantia)
+thTablaCuantia.style.cursor = "pointer"
+trTabla.appendChild(thTablaCuantia)
 
-theadTabla.appendChild(trTabla.cloneNode(true))
+thTablaAcciones.innerHTML = "Acciones"
+trTabla.appendChild(thTablaAcciones)
+
+theadTabla.appendChild(trTabla)
 
 tabla.appendChild(theadTabla)
 tabla.appendChild(tbodyTabla)
@@ -157,7 +175,25 @@ document.body.appendChild(seccionBanco)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 //--------------------------Métodos
+
+function resetearFormulario() {
+    inputFecha.value = 0
+    inputCuantia.value = 0
+}
+
 function añadirRegistro() {
     const validacion = validarNuevoRegistro()
 
@@ -205,14 +241,12 @@ function validarNuevoRegistro() {
     return true
 }
 
-function cargarTabla() {
-    vaciarTabla()
-
+//Retorna todos los registros basados en el filtro
+function cargarRegistros() {
     const cajaId = inputCajaFiltro.options[inputCajaFiltro.selectedIndex].value
     const conceptoId = inputConceptoFiltro.options[inputConceptoFiltro.selectedIndex].value
 
     let registros = []
-    let total = 0
 
     //Se filtra por caja
     registros = banco.getRegistrosCaja(cajaId)
@@ -221,23 +255,123 @@ function cargarTabla() {
     if (conceptoId != -1) {
         registros = registros.filter(registro => registro.getConcepto().getId() == conceptoId)
     }
+
+    return registros
+
+}
+
+//----------Funciones para cargar tabla
+//-----Funciones para filtrar u ordenar tabla
+function cargarTablaFiltro() {
+    cargarTabla(cargarRegistros())
+}
+
+function cargarTablaOrdenId() {
+    let registros = cargarRegistros()
+
+    let registrosOrdenados = registros.sort((registroA, registroB) => {
+        if (registroA.getId() > registroB.getId()) {
+            return 1
+
+        } else if (registroA.getId() < registroB.getId()) {
+            return -1
+
+        } else {
+            return 0
+        }
+    })
+
+    cargarTabla(registrosOrdenados)
+}
+
+function cargarTablaOrdenFecha() {
+    let registros = cargarRegistros()
+
+    let registrosOrdenados = registros.sort((registroA, registroB) => {
+        const fechaA = new Date(registroA.getFecha())
+        const fechaB = new Date(registroB.getFecha())
+        
+        if (fechaA.getTime() > fechaB.getTime()) {
+            return -1
+
+        } else if (fechaA.getTime() < fechaB.getTime()) {
+            return 1
+
+        } else {
+            return 0
+        }
+    })
+
+    cargarTabla(registrosOrdenados)
+}
+
+function cargarTablaOrdenCuantia() {
+    let registros = cargarRegistros()
+
+    let registrosOrdenados = registros.sort((registroA, registroB) => {
+        
+        if (Number(registroA.getCuantia()) > Number(registroB.getCuantia())) {
+            return -1
+
+        } else if (Number(registroA.getCuantia()) < Number(registroB.getCuantia())) {
+            return 1
+
+        } else if (Number(registroA.getCuantia()) == Number(registroB.getCuantia())){
+            return 0
+        }
+    })
+
+    cargarTabla(registrosOrdenados)
+}
+
+//-----Generar tabla
+function cargarTabla(registros) {
+    vaciarTabla()
+
+    const cajaId = inputCajaFiltro.options[inputCajaFiltro.selectedIndex].value
+    let total = 0
     
     //Rellenar tabla
     registros.forEach(registro => {
         const fila = document.createElement('tr')
         const td = document.createElement('td')
 
+        fila.id = registro.getId()
+
         td.innerHTML = registro.getId()
+        td.id = "td_id"
         fila.appendChild(td.cloneNode(true))
 
         td.innerHTML = registro.getFecha()
+        td.id = "td_fecha"
         fila.appendChild(td.cloneNode(true))
 
         td.innerHTML = registro.getConcepto().getNombre()
+        td.id = "td_concepto"
         fila.appendChild(td.cloneNode(true))
 
         td.innerHTML = registro.getCuantia()
+        td.id = "td_cuantia"
         fila.appendChild(td.cloneNode(true))
+
+        //Botones acciones
+        let btnAccionEliminar = document.createElement("button")
+        let btnAccionEditar = document.createElement("button")
+
+        btnAccionEliminar.id = "btnEliminar"
+        btnAccionEditar.id = "btnEditar"
+
+        btnAccionEliminar.innerHTML = "Eliminar"
+        btnAccionEditar.innerHTML = "Editar"
+
+        btnAccionEliminar.addEventListener("click", () => eliminarRegistro(cajaId, registro.getId()))
+        btnAccionEditar.addEventListener("click", () => mostrarEditarRegistro(cajaId, registro.getId()))
+
+        td.innerHTML = ""
+        td.id = "td_acciones"
+        td.appendChild(btnAccionEliminar)
+        td.appendChild(btnAccionEditar)
+        fila.appendChild(td)
 
         tbodyTabla.appendChild(fila)
 
@@ -269,4 +403,126 @@ function vaciarTabla() {
 
 function resetearTabla() {
     vaciarTabla()
+}
+
+function eliminarRegistro(cajaId, registroId) {
+    banco.eliminarRegistro(cajaId, registroId)
+
+    cargarTablaFiltro()
+}
+
+function mostrarEditarRegistro(cajaId, registroId) {
+    cargarTablaFiltro()
+
+    const tdFecha = document.querySelector("tr[id='"+registroId + "'] #td_fecha")
+    const tdCuantia = document.querySelector("tr[id='"+registroId + "'] #td_cuantia")
+    const tdConcepto = document.querySelector("tr[id='"+registroId + "'] #td_concepto")
+    const tdAcciones = document.querySelector("tr[id='"+registroId + "'] #td_acciones")
+    const btnEditar = document.querySelector("tr[id='"+registroId + "'] > #td_acciones > #btnEditar")
+    const btnAceptar = document.createElement("button")
+    const registro = banco.buscarCaja(cajaId).getRegistro(registroId)
+
+    //Eliminar el boton de editar
+    btnEditar.remove()
+
+    //Crear boton aceptar
+    btnAceptar.innerHTML = "Aceptar"
+    btnAceptar.addEventListener("click", () => editarRegistro(cajaId, registroId))
+    tdAcciones.appendChild(btnAceptar)
+
+    //Agregar campos
+    const inputEditarFecha = document.createElement("input")
+    const inputEditarConcepto = document.createElement("select")
+    const inputEditarCuantia = document.createElement("input")
+
+    inputEditarFecha.id = "inputEditarFecha"
+    inputEditarConcepto.id = "inputEditarConcepto"
+    inputEditarCuantia.id = "inputEditarCuantia"
+
+    inputEditarFecha.type = "date"
+    inputEditarCuantia.type = "number"
+
+    inputEditarFecha.value = registro.getFecha()
+    inputEditarCuantia.value = registro.getCuantia()
+
+    inputEditarFecha.placeholder = "Nueva fecha"
+    inputEditarCuantia.placeholder = "Nueva cuantía"
+
+    //Rellenar conceptos
+    conceptos.forEach(conceptoActual => {
+        const optionConcepto = document.createElement("option")
+        optionConcepto.value = conceptoActual.getId()
+        optionConcepto.innerHTML = conceptoActual.getNombre()
+
+        //Comprobar si el concepto actual es el mismo que el del registro a editar
+        if (conceptoActual.getId() == registro.getConcepto().getId()) {
+            optionConcepto.selected = true
+        }
+
+        inputEditarConcepto.appendChild(optionConcepto)
+    })
+
+    //Sustituir las columnas por los campos
+    tdFecha.innerHTML = ""
+    tdCuantia.innerHTML = ""
+    tdConcepto.innerHTML = ""
+
+    tdFecha.appendChild(inputEditarFecha)
+    tdCuantia.appendChild(inputEditarCuantia)
+    tdConcepto.appendChild(inputEditarConcepto)
+}
+
+function editarRegistro(cajaId, registroId) {
+    //Validar que los campos son correctos
+    const validacion = validarEditarRegistro()
+    if (validacion !== true) {
+        alert(validacion)
+        return false
+    }
+
+    const inputEditarFecha = document.getElementById("inputEditarFecha")
+    const inputEditarConcepto = document.getElementById("inputEditarConcepto")
+    const inputEditarCuantia = document.getElementById("inputEditarCuantia")
+
+    //Guardar los nuevos valores
+    let valores = {}
+
+    valores.cuantia = inputEditarCuantia.value
+    valores.fecha = inputEditarFecha.value
+    valores.concepto = conceptos.find(concepto => concepto.getId() == inputEditarConcepto.options[inputEditarConcepto.selectedIndex].value)
+
+    //Editar registro
+    banco.editarRegistro(cajaId, registroId, valores)
+
+    cargarTablaFiltro()
+}
+
+function validarEditarRegistro() {
+    const fecha = new Date(document.getElementById("inputEditarFecha").value)
+    const fechaActual = new Date()
+    
+    if (isNaN(Number(fecha.getTime()))) {
+        return "Fecha inválida"
+    }
+    if (fechaActual.getTime() < fecha.getTime()) {
+        return "La fecha no puede ser posterior a la actual"
+    }
+
+    //Cuantia
+    const cuantia = document.getElementById("inputEditarCuantia").value
+    if (isNaN(Number(cuantia))) {
+        return "Cuantía inválida"
+    }
+    if (cuantia == 0) {
+        return "La cuantía debe ser distinto de 0"
+    }
+    if (cuantia < 0) {
+        const cajaSeleccionada = banco.getCajas().find(caja => caja.getId() == inputCaja.options[inputCaja.selectedIndex].value)
+
+        if (cajaSeleccionada.getTotal() < Math.abs(cuantia)) {
+            return "En la cuenta seleccionada no hay suficiente dinero para retirar"
+        }    
+    }
+
+    return true
 }

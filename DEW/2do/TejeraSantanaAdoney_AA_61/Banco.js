@@ -48,4 +48,16 @@ class Banco {
 
         return caja
     }
+
+    eliminarRegistro(cajaId, registroId) {
+        const caja = this.buscarCaja(cajaId)
+
+        caja.eliminarRegistro(registroId)
+    }
+
+    editarRegistro(cajaId, registroId, valores) {
+        const caja = this.buscarCaja(cajaId)
+
+        caja.editarRegistro(registroId, valores)
+    }
 }

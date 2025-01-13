@@ -54,4 +54,24 @@ class Caja {
 
         return id
     }
+
+    eliminarRegistro(idRegistro) {
+        const nuevoRegistros = this.registros.filter(registroActual => registroActual.getId() != idRegistro)
+
+        this.registros = nuevoRegistros
+    }
+    
+    getRegistro(idRegistro) {
+        const registro = this.registros.find(conceptoActual => conceptoActual.getId() == idRegistro)
+
+        return registro
+    }
+
+    editarRegistro(idRegistro, valores) {
+        const registro = this.getRegistro(idRegistro)
+
+        registro.setFecha(valores.fecha)
+        registro.setCuantia(valores.cuantia)
+        registro.setConcepto(valores.concepto)
+    }
 }

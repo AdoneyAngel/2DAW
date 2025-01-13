@@ -14,6 +14,9 @@ class Registro {
     getCuantia() {
         return this.cuantia
     }
+    setCuantia(cuantia) {
+        this.cuantia = cuantia
+    }
     setId(id) {
         this.id = id
     }
@@ -23,7 +26,13 @@ class Registro {
     getConcepto() {
         return this.concepto
     }
+    setConcepto(concepto) {
+        this.concepto = concepto
+    }
     getFecha() {
         return this.fecha
+    }
+    setFecha(fecha) {
+        this.fecha = fecha
     }
 }

@@ -8,12 +8,18 @@
         * {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             outline: none;
+            margin: 0;
+        }
+        input, select, textarea {
+            border: 1.5px solid var(--grey);
         }
         :root {
             --dark: rgb(81, 83, 99);
+            --darker: rgb(35, 36, 43);
             --grey: rgb(143, 148, 175);
             --red: rgb(255, 60, 0);
             --orange: rgb(252, 194, 35);
+            --green: rgb(58, 253, 139);
         }
         body {
             display: flex;
@@ -47,25 +53,33 @@
             animation: loadingAni 1s linear infinite;
         }
         #notificacion, #notificacion_error {
-            position: absolute;
+            position: fixed;
             top: 10px;
             left: 50%;
-            transform: translateX(-50%);
-            background: rgb(143, 148, 175);
+            transform: translate(-50%, -150%);
+            background: var(--green);
             color: rgb(81, 83, 99);
             padding: 10px;
             border: 1px solid rgb(81, 83, 99);
             font-weight: bold;
-            animation: notificacionAni .3s ease-out;
+            animation: notificacionAni .3s ease-out, notificacionAni .3s ease-in reverse;
+            animation-delay: 0s, 3s;
             display: none;
             cursor: pointer;
         }
         #notificacion_error {
             background-color: var(--orange);
         }
+        #listaBox {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
         table {
             border-collapse: collapse;
-            min-width: 800px;
+            width: calc(100% - 20px);
         }
         table thead tr th {
             font-size: 1.2rem;
@@ -121,6 +135,10 @@
             background: var(--grey);
             color: white;
         }
+        table #btnAñadir_tabla {
+            background: var(--green);
+            color: var(--darker);
+        }
         .formulario {
             display: flex;
             justify-content: center;
@@ -156,6 +174,50 @@
             padding: 5px 0;
             cursor: pointer;
         }
+        .formulario .price_range {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+        .formulario .price_range input {
+            margin: 0 5px;
+            margin-bottom: 5px;
+            padding: 5px 15px;
+            resize: none;
+            font-size: 1rem;
+        }
+        #crearBox {
+            background: var(--dark);
+            padding-top: 30px;
+            padding-bottom: 40px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        #crearBox input, #crearBox textarea, #crearBox select {
+            margin-bottom: 5px;
+            padding: 5px 15px;
+            resize: none;
+            font-size: 1rem;
+            background: transparent;
+            border-color: var(--darker);
+            color: white;
+        }
+        #crearBox label {
+            color: #d3d3d3;
+        }
+        #crearBox button {
+            background: var(--grey);
+            border: 1.5px solid var(--darker);
+        }
+        #crearBox option {
+            background: var(--dark);
+        }
         h1 {
             font-weight: 100;
         }
@@ -179,18 +241,25 @@
     </style>
 </head>
 <body>
-    <div id="crearBox" class="formulario">
-        <h1>Crear producto</h1>
-        <label>Title</label>
-        <input type="text" placeholder="Título" id="crear_title" name="title">
-
-        <label>Description</label>
-        <textarea name="description" id="crear_description" placeholder="Descripción"></textarea>
-
-        <label>Price</label>
-        <input type="number" id="crear_price" placeholder="Precio" min="1">
-
-        <button onclick="crearProducto()">Crear producto</button>
+    <div id="crearBox">
+        <div class="formulario">
+            <h1>Crear producto</h1>
+            <label>Title</label>
+            <input type="text" placeholder="Título" id="crear_title" name="title">
+    
+            <label>Description</label>
+            <textarea name="description" id="crear_description" placeholder="Descripción"></textarea>
+    
+            <label>Category</label>
+            <select id="crear_category">
+                <option value="">Sin seleccionar</option>
+            </select>
+    
+            <label>Price</label>
+            <input type="number" id="crear_price" placeholder="Precio" min="1">
+    
+            <button onclick="crearProducto()">Crear producto</button>
+        </div>
     </div>
 
     <br>
@@ -203,10 +272,37 @@
         <label>Description</label>
         <textarea name="description" id="editar_description" placeholder="Descripción"></textarea>
 
+        <label>Category</label>
+        <select id="editar_category">
+            <option value="">Sin seleccionar</option>
+        </select>
+
         <label>Price</label>
         <input type="number" id="editar_price" placeholder="Precio" min="1">
 
         <button id="btn_editar">Editar producto</button>
+    </div>
+
+    <br><br>
+
+    <div id="filtroBox" class="formulario">
+        <h1>Filtros</h1>
+        <label>Buscar producto</label>
+        <input type="text" id="filtrar_nombre" placeholder="Nombre del producto">
+
+        <label>Categoría</label>
+        <select id="filtrar_category">
+            <option value="">Sin seleccionar</option>
+        </select>
+
+        <label>Precio</label>
+        <div class="price_range">
+            <input type="number" placeholder="Precio mínimo" id="filtrar_min_price">
+            -
+            <input type="number" placeholder="Precio máximo" id="filtrar_max_price">
+        </div>
+
+        <button onclick="filtrarTabla()">Filtrar</button>
     </div>
 
     <br><br>
@@ -219,7 +315,9 @@
                     <th>ID</th>
                     <th>Title</th>
                     <th>Description</th>
+                    <th>Category</th>
                     <th>Price</th>
+                    <th>En carrito</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -239,6 +337,9 @@
     <div id="notificacion">Mensaje a mostrar</div>
     <div id="notificacion_error" class="alert">Mensaje a mostrar</div>
 
+    <br>
+
+    <script src="Categoria.js"></script>
     <script src="Producto.js"></script>
     <script src="Principal.js"></script>
 </body>

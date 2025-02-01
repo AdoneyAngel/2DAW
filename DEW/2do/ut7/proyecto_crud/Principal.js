@@ -4,40 +4,89 @@ const tbody = document.getElementById("tbody")
 const crear_title = document.getElementById("crear_title")
 const crear_description = document.getElementById("crear_description")
 const crear_price = document.getElementById("crear_price")
+const crear_category = document.getElementById("crear_category")
+const editar_title = document.getElementById("editar_title")
+const editar_description = document.getElementById("editar_description")
+const editar_price = document.getElementById("editar_price")
+const editar_category = document.getElementById("editar_category")
 const editarBox = document.getElementById("editarBox")
 const loadingBackground = document.getElementById("loadingBackground")
 const notificacionBox = document.getElementById("notificacion")
 const notificacionErrorBox = document.getElementById("notificacion_error")
+const filtrar_name = document.getElementById("filtrar_nombre")
+const filtrar_category = document.getElementById("filtrar_category")
+const filtrar_min_price = document.getElementById("filtrar_min_price")
+const filtrar_max_price = document.getElementById("filtrar_max_price")
 
 let productosCargados = []
+let categoriasCargadas = []
+let max_price = 1000
+let pagina = 0
+let cargandoPagina = false
 
 
 
+document.addEventListener("scroll", () => {//Detectar el scroll de la pagina
+    const recorrido = window.scrollY
+    const tamañoContenedor = document.body.offsetHeight - window.innerHeight
 
+    const porcentajeScroll = (recorrido/tamañoContenedor)*100;
+    
+    if (porcentajeScroll >= 90 && !cargandoPagina) {
+        cargandoPagina = true
+
+        cargarSiguientePagina().then(res => {
+            cargandoPagina = false
+        })
+    }
+})
 
 
 
 //Métodos
-async function descargarProductos() {
+async function descargarProductos(pagina) {
 
-    return fetch("https://dummyjson.com/products")
+    return fetch("https://dummyjson.com/products?limit=10&skip="+pagina)
     .then(res => res.json())
     .then(productos => {
+
+        let newMax_price = 0
         
         productosCargados = productos.products.map(productoActual => {
-            const productoClass = new Producto(productoActual.id, productoActual.title, productoActual.description, productoActual.price)
+            const categoriaProducto = new Categoria(productoActual.category)
+            const productoClass = new Producto(productoActual.id, productoActual.title, productoActual.description, categoriaProducto, productoActual.price)
             
+            if (productoActual.price > newMax_price) {
+                newMax_price = productoActual.price
+            }
+
             return productoClass
         })
 
-        return true
+        max_price = newMax_price
+
+        filtrar_min_price.value = 0
+        filtrar_max_price.value = max_price
+
+        return productosCargados
     })
 }
 
-function cargarTabla() {
+async function cargarSiguientePagina() {
+    pagina++
+
+    return descargarProductos(pagina).then(productos => {
+        productos.forEach(productoActual => añadirProductoTabla(productoActual))
+
+        return true
+    })
+
+}
+
+function cargarTabla(productos) {
     vaciarTabla()
 
-    productosCargados.forEach(producto => {
+    productos.forEach(producto => {
         añadirProductoTabla(producto)
     })
 }
@@ -53,6 +102,10 @@ function añadirProductoTabla(producto) {
     const td = document.createElement("td")
     const btnEliminar = document.createElement("button")
     const btnEditar = document.createElement("button")
+    const btnAñadir = document.createElement("button")
+
+    btnAñadir.textContent = "Añadir al carrito"
+    btnAñadir.id = "btnAñadir_tabla"
 
     btnEliminar.addEventListener("click", () => eliminarProducto(producto.getId()))
     btnEliminar.textContent = "Eliminar"
@@ -71,12 +124,21 @@ function añadirProductoTabla(producto) {
     td.innerHTML = producto.getDescription()
     tr.appendChild(td.cloneNode(true))
 
+    td.innerHTML = producto.getCategory().getName()
+    tr.appendChild(td.cloneNode(true))
+
     td.innerHTML = producto.getPrice() + "€"
     tr.appendChild(td.cloneNode(true))
 
+    td.innerHTML = 0
+    tr.appendChild(td.cloneNode(true))
+
     td.innerHTML = ""
-    td.appendChild(btnEliminar)
+
+    td.appendChild(btnAñadir)
     td.appendChild(btnEditar)
+    td.appendChild(btnEliminar)
+
     tr.appendChild(td)
 
     tbody.appendChild(tr)
@@ -85,7 +147,7 @@ function añadirProductoTabla(producto) {
 function eliminarProducto(productoId) {
     productosCargados = productosCargados.filter(producto => producto.getId() != productoId)
 
-    cargarTabla()
+    cargarTabla(productosCargados)
 }
 
 async function crearProducto() {
@@ -96,7 +158,10 @@ async function crearProducto() {
         return false
     }
 
-    nuevoProducto = new Producto(-1, crear_title.value, crear_description.value, crear_price.value)
+    const categoriaSeleccionada = crear_category.options[crear_category.selectedIndex].value
+    const categoriaClass = new Categoria(categoriaSeleccionada)
+
+    nuevoProducto = new Producto(-1, crear_title.value, crear_description.value, categoriaClass, crear_price.value)
 
     setLoading()
 
@@ -106,14 +171,18 @@ async function crearProducto() {
 
     }).then(res => res.json())
     .then(result => {
+        const categoriaProducto = new Categoria(result.category)
         const productoAñadido = new Producto(
             result.id,
             result.title,
             result.description,
+            categoriaProducto,
             result.price
         )
 
         añadirProductoTabla(productoAñadido)
+
+        productosCargados.push(productoAñadido)
 
         mostrarMensaje("Producto añadido correctamente")
 
@@ -141,28 +210,37 @@ function validarCrear() {
         return "Precio del producto inválido"
     }
 
+    if (!crear_category.value.length) {
+        return "Debe seleccionar una categoría"
+    }
+
     return false
 }
 
 function mostrarEditarProducto(producto) {
-    const inputTitulo = document.getElementById("editar_title")
-    const inputDescription = document.getElementById("editar_description")
-    const inputPrice = document.getElementById("editar_price")
     const btnEditar = document.getElementById("btn_editar")
 
     editarBox.style.display = "flex"
 
-    inputTitulo.value = producto.getTitle()
-    inputDescription.value = producto.getDescription()
-    inputPrice.value = producto.getPrice()
+    editar_title.value = producto.getTitle()
+    editar_description.value = producto.getDescription()
+    editar_price.value = producto.getPrice()
+
+    //Establecer la categoría seleccionado
+    for (let optIndex = 0; optIndex<editar_category.options.length; optIndex++) {
+        const optActual = editar_category.options[optIndex]
+        if (optActual.value == producto.getCategory().getName()) {
+            optActual.selected = true
+
+        } else {
+            optActual.selected = false
+        } 
+    }
 
     btnEditar.onclick = () => editarProducto(producto.getId())
 }
 
 async function editarProducto(productoId) {
-    const inputTitulo = document.getElementById("editar_title")
-    const inputDescription = document.getElementById("editar_description")
-    const inputPrice = document.getElementById("editar_price")
     const btnEditar = document.getElementById("btn_editar")
 
     editarBox.style.display = "none"
@@ -172,21 +250,24 @@ async function editarProducto(productoId) {
     return fetch("https://dummyjson.com/products/"+productoId, {
         method: "PUT",
         body: new URLSearchParams({
-            title: inputTitulo.value,
-            description: inputDescription.value,
-            price: inputPrice.value,
+            title: editar_title.value,
+            description: editar_description.value,
+            category: editar_category.options[editar_category.selectedIndex].value,
+            price: editar_price.value,
         })
 
     })
     .then(res => res.json())
     .then(resultado => {
         //Se resetea los campos
-        inputTitulo.value = ""
-        inputDescription.value = ""
-        inputPrice.value = 0
+        editar_title.value = ""
+        editar_description.value = ""
+        editar_price.value = 0
         btnEditar.onclick = null
 
-        const productoResultante = new Producto(productoId, resultado.title, resultado.description, resultado.price)
+        const categoriaProducto = new Categoria(resultado.category)
+
+        const productoResultante = new Producto(productoId, resultado.title, resultado.description, categoriaProducto, resultado.price)
 
         //Modificar en la tabla y volver a cargarla
         productosCargados = productosCargados.map(producto => {
@@ -196,7 +277,7 @@ async function editarProducto(productoId) {
             return producto
         })
 
-        cargarTabla()
+        cargarTabla(productosCargados)
 
         mostrarMensaje("Producto modificado exitosamente")
         
@@ -232,13 +313,73 @@ function unsetLoading() {
     loadingBackground.style.display = "none"
 }
 
+function filtrarTabla() {
+    let productosFiltrados = [...productosCargados]
 
+    //nombre
+    if (filtrar_name.value.length) {
+        productosFiltrados = productosFiltrados.filter(productoActual => productoActual.getTitle().slice(0, filtrar_name.value.length).toLowerCase() == filtrar_name.value.toLowerCase())
 
+        filtrar_name.value = ""
+    }
+
+    //categoria
+    const categoriaSeleccionada = filtrar_category.options[filtrar_category.selectedIndex].value
+    
+    if (categoriaSeleccionada.length) {
+        productosFiltrados = productosFiltrados.filter(productoActual => productoActual.getCategory().getName() == categoriaSeleccionada)
+    }
+
+    //precio
+    productosFiltrados = productosFiltrados.filter(productoActual => productoActual.getPrice() >= filtrar_min_price.value && productoActual.getPrice() <= filtrar_max_price.value)
+
+    filtrar_min_price.value = 0
+    filtrar_max_price.value = max_price
+
+    cargarTabla(productosFiltrados)
+}
+
+async function descargarCategorias() {
+    return fetch('https://dummyjson.com/products/categories')
+    .then(res => res.json())
+    .then(respuesta => {
+        const categorias = respuesta.map(categoria => {
+            const categoriaClass = new Categoria(categoria.slug)
+
+            return categoriaClass
+        })
+
+        return categorias
+    })
+}
+
+function cargarCategorias(categorias) {
+    categorias.forEach(categoriaActual => {
+        const optionCategoria = document.createElement("option")
+        
+        optionCategoria.value = categoriaActual.getName()
+        optionCategoria.textContent = categoriaActual.getName()
+
+        crear_category.appendChild(optionCategoria.cloneNode(true))
+        editar_category.appendChild(optionCategoria.cloneNode(true))
+        filtrar_category.appendChild(optionCategoria.cloneNode(true))
+    })
+}
+
+function añadirCookie(nombre, valor) {
+    document.cookie = "nombre=valor; path=/; max-age=3600";
+    console.log(document.cookie)
+}
+
+añadirCookie("pr", "1111")
 
 
 
 
 //Métodos iniciales
-descargarProductos().then(res => {//Descargar los productos y posteriormente cargar la tabla
-    cargarTabla()
+descargarProductos(0).then(productos => {//Descargar los productos y posteriormente cargar la tabla
+    cargarTabla(productos)
+})
+descargarCategorias().then(categorias => {
+    cargarCategorias(categorias)
 })

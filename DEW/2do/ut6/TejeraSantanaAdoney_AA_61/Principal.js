@@ -94,6 +94,10 @@ const thTablaAcciones = document.createElement("th")
 const trTabla = document.createElement("tr")
 const theadTabla = document.createElement("thead")
 const tbodyTabla = document.createElement("tbody")
+const tituloCaja = document.createElement("h2")
+
+tituloCaja.id = "tituloCaja"
+tituloCaja.innerHTML = ""
 
 const inputConceptoFiltro = document.createElement("select")
 const inputCajaFiltro = document.createElement("select")
@@ -170,6 +174,7 @@ theadTabla.appendChild(trTabla)
 tabla.appendChild(theadTabla)
 tabla.appendChild(tbodyTabla)
 
+seccionBanco.appendChild(tituloCaja)
 seccionBanco.appendChild(tabla)
 document.body.appendChild(seccionBanco)
 
@@ -204,6 +209,20 @@ function añadirRegistro() {
         const nuevoRegistro = new Registro(0, conceptoSeleccionado, inputCuantia.value, inputFecha.value)
 
         banco.insertarRegistro(cajaSeleccionada, nuevoRegistro)
+
+        //Se cambia el option seleccionado del filtro para que se asigne la caja al que se ha insertado el registro
+        for (let optIndex = 0; optIndex<inputCajaFiltro.length; optIndex++) {
+            let optionCajaFiltroActual = inputCajaFiltro.options[optIndex]
+
+            if (optionCajaFiltroActual.value == cajaSeleccionada) {
+                optionCajaFiltroActual.selected = true
+
+            } else {
+                optionCajaFiltroActual.selected = false
+            }
+        }
+
+        cargarTablaFiltro()
         
     } else {
         alert(validacion)
@@ -329,7 +348,12 @@ function cargarTabla(registros) {
     vaciarTabla()
 
     const cajaId = inputCajaFiltro.options[inputCajaFiltro.selectedIndex].value
+    const caja = banco.buscarCaja(cajaId)
     let total = 0
+
+    //Establecer titulo de la caja seleccionada
+    const tituloCaja = document.getElementById("tituloCaja")
+    tituloCaja.innerHTML = caja.getNombre()
     
     //Rellenar tabla
     registros.forEach(registro => {

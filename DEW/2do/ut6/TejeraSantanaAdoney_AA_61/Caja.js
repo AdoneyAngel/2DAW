@@ -15,6 +15,9 @@ class Caja {
     getId() {
         return this.id
     }
+    getNombre() {
+        return this.nombre
+    }
 
     getTotal() {
         let total = 0

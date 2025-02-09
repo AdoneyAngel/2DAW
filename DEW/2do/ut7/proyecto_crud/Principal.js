@@ -22,6 +22,7 @@ const filtrar_min_price = document.getElementById("filtrar_min_price")
 const filtrar_max_price = document.getElementById("filtrar_max_price")
 const darkBackground = document.getElementById("darkBackground")
 const floatingInput = document.getElementById("floatingInput")
+const carritoView = document.getElementById("carritoView")
 
 let productosCargados = []
 let categoriasCargadas = []
@@ -564,10 +565,16 @@ async function guardarProductoCarrito(id, unidades = 1) {
 
     if (!existeEnCarrito) {
         const productoLocal = await buscarProducto(id)
-        productoLocal.setStock(productoLocal.getStock()-1)
-        productoLocal.setEnCarrito(Number(productoLocal.getEnCarrito())+1)
 
-        carritoCargado.push(productoLocal)
+        if (productoLocal.getStock() >= unidades) {
+            productoLocal.setStock(productoLocal.getStock()-unidades)
+            productoLocal.setEnCarrito(Number(productoLocal.getEnCarrito())+unidades)
+    
+            carritoCargado.push(productoLocal)
+
+        } else {
+            mostrarError("No hay unidades suficientes")
+        }
     }
 
     //Se genera el string del carrito
@@ -629,9 +636,12 @@ async function cargarProductosCarrito() {
 
     console.log("Cargando: " + (new Date()).getMilliseconds())
 
-    if (!carrito) {
+    if (!carrito || !carrito.length) {
+        ocultarCarrito()
         return false
     }
+
+    mostrarCarrito()
 
     carrito.forEach(producto => {
         const tr = document.createElement("tr")
@@ -716,6 +726,17 @@ function buscarProductoCarritoCookie(id) {
     })
 
     return productoEncontrado
+}
+
+function mostrarCarrito() {
+    document.body.style.gridTemplateColumns = "30% 1fr"
+    carritoView.style.display = "block"
+    
+}
+
+function ocultarCarrito() {
+    document.body.style.gridTemplateColumns = "1fr"
+    carritoView.style.display = "none"
 }
 
 async function crearProducto() {
@@ -804,6 +825,7 @@ function hiddeFloatingInput() {
 
     input.placeholder = ""
     input.type = ""
+    input.value = ""
 
     inputTitle.innerHTML = ""
 
@@ -830,9 +852,17 @@ function hiddeDarkedWindow(idBox) {
 
 }
 
+function showConfirm(message, action) {
+
+}
+function hiddeConfirm() {
+    
+}
+
 
 
 //Métodos iniciales
+ocultarCarrito()
 descargarProductos(0).then(async productos => {//Descargar los productos y carrito y posteriormente cargar la tabla
     productosCargados = productos
 

@@ -22,10 +22,27 @@
             --green: rgb(58, 253, 139);
         }
         body {
+            display: grid;
+            grid-template-columns: 30% 1fr;
+            grid-gap: 20px;
+        }
+        #carritoView {
+            padding: 10px;
+            position: sticky;
+            top: 0;
+            left: 0;
+            transform: translate(10px, 10px);
+            height: calc(100dvh - 40px);
+        }
+        #carritoView h1 {
+            text-align: center;
+        }
+        #tiendaView {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            border-left: 3px solid var(--dark);
         }
         #loadingBackground {
             background: rgba(0, 0, 0, .3);
@@ -56,14 +73,14 @@
             position: fixed;
             top: 10px;
             left: 50%;
-            transform: translate(-50%, -150%);
+            transform: translate(-50%);
             background: var(--green);
             color: rgb(81, 83, 99);
             padding: 10px;
             border: 1px solid rgb(81, 83, 99);
             font-weight: bold;
-            animation: notificacionAni .3s ease-out, notificacionAni .3s ease-in reverse;
-            animation-delay: 0s, 3s;
+            animation: notificacionAni .3s ease-out;
+            animation-delay: 0s;
             display: none;
             cursor: pointer;
         }
@@ -86,18 +103,6 @@
             color: var(--grey);
             padding: 20px 0;
             position: relative;
-        }
-        table thead tr th::after {
-            content: "";
-            display: block;
-            position: absolute;
-            width: 0px;
-            height: 0px;
-            border-radius: 0%;
-            border: 5px solid transparent;
-            border-top: 10px solid rgba(143, 148, 175, 0.24);
-            left: 50%;
-            transform: translateX(-50%);
         }
         
         table thead tr th::before {
@@ -145,34 +150,37 @@
             flex-direction: column;
             min-width: 400px;
             width: 70%;
+            padding: 20px;
         }
-        .formulario > input, .formulario > textarea {
+        .formulario input, .formulario > textarea, select {
             margin-bottom: 5px;
-            padding: 5px 15px;
+            padding: 10px 15px;
             resize: none;
             font-size: 1rem;
+            background: var(--grey);
+            color: white;
+            border-radius: 5px;
+            /* border: 2px solid var(--grey); */
+            border: none;
+        }
+        .formulario input::placeholder {
+            color: #dfdfdf;
         }
         .formulario > label {
+            margin-top: 15px;
+            bottom: 5px;
             margin-left: 20px;
             position: relative;
             color: grey;
         }
-        .formulario > label::before {
-            content: "";
-            display: inline;
-            position: absolute;
-            width: 0px;
-            height: 0px;
-            background-color: transparent;
-            border: 5px solid transparent;
-            border-left: 10px solid var(--grey);
-            top: 50%;
-            left: 0;
-            transform: translate(-100%, -50%);
-        }
         .formulario button {
-            padding: 5px 0;
+            padding: 10px 0;
+            margin: 10px 0;
+            margin-top: 25px;
             cursor: pointer;
+            display: block;
+            border-radius: 5px;
+            border: 1px solid var(--grey);
         }
         .formulario .price_range {
             width: 100%;
@@ -192,34 +200,135 @@
             background: var(--dark);
             padding-top: 30px;
             padding-bottom: 40px;
-            width: 100%;
-            display: flex;
+            width: 90%;
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            border-radius: 10px;
+            opacity: 1;
+            animation: crearBoxAni .2s ease-out;
         }
         #crearBox input, #crearBox textarea, #crearBox select {
             margin-bottom: 5px;
-            padding: 5px 15px;
             resize: none;
             font-size: 1rem;
-            background: transparent;
+            background: var(--darker);
             border-color: var(--darker);
             color: white;
+        }
+        #crearBox input::placeholder, #crearBox textarea::placeholder {
+            color: #dfdfdf;
         }
         #crearBox label {
             color: #d3d3d3;
         }
         #crearBox button {
             background: var(--grey);
-            border: 1.5px solid var(--darker);
+            margin: 10px 0;
+            margin-top: 25px;
         }
         #crearBox option {
-            background: var(--dark);
+            background: var(--darker);
         }
         h1 {
             font-weight: 100;
+            margin-bottom: 15px;
+        }
+        #makeErrorBox {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--dark);
+            opacity: .8;
+            border-radius: 5px;
+            color: white;
+            font-size: 1.2rem;
+            overflow: hidden;
+            cursor: pointer;
+            padding: 10px;
+            width: 50px;
+            height: 25px;
+            border: 3px solid var(--red);
+        }
+        #makeErrorBox button {
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            color: white;
+            position: absolute;
+            bottom: 0px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #makeErrorBox img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            z-index: -1;
+            filter: brightness(.8);
+        }
+        #btnUnsetFiltrando {
+            margin-left: auto;
+            border: none;
+            background: transparent;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--grey);
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            padding: 0;
+            display: none;
+        }
+        #filtroBox{
+            transition: .15s ease-in-out;
+            border-radius: 10px;
+            border: 0px solid var(--grey);
+            position: relative;
+            box-shadow: 0px 0px 0px 0px var(--grey);
+        }
+        #filtroBox.filtrando {
+            border: 5px solid var(--grey);
+            box-shadow: 0px 0px 15px -5px var(--grey);
+        }
+        #filtroBox.filtrando #btnUnsetFiltrando {
+            display: block;
+        }
+        #darkBackground {
+            width: 100%;
+            height: 100dvh;
+            background: rgba(0, 0, 0, 0.301);
+            backdrop-filter: blur(3px);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9;
+            transition: .2s;
+            display: none;
+            opacity: 1;
+            animation: darkBackgroundAni .2s ease-out;
+        }
+        #btnCrear {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            color: black;
+            box-shadow: 0px 0px 5px var(--green);
+            font-weight: bold;
+            background: var(--green);
+            cursor: pointer;
         }
 
         @keyframes notificacionAni {
@@ -238,106 +347,153 @@
                 background-position: -100%;
             }
         }
+        @keyframes crearBoxAni {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        @keyframes darkBackgroundAni {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="crearBox">
-        <div class="formulario">
-            <h1>Crear producto</h1>
-            <label>Title</label>
-            <input type="text" placeholder="Título" id="crear_title" name="title">
-    
-            <label>Description</label>
-            <textarea name="description" id="crear_description" placeholder="Descripción"></textarea>
-    
-            <label>Category</label>
-            <select id="crear_category">
-                <option value="">Sin seleccionar</option>
-            </select>
-    
-            <label>Price</label>
-            <input type="number" id="crear_price" placeholder="Precio" min="1">
-    
-            <button onclick="crearProducto()">Crear producto</button>
-        </div>
-    </div>
-
-    <br>
-
-    <div id="editarBox" style="display: none;" class="formulario">
-        <h1>Editar producto</h1>
-        <label>Title</label>
-        <input type="text" placeholder="Título" id="editar_title" name="title">
-
-        <label>Description</label>
-        <textarea name="description" id="editar_description" placeholder="Descripción"></textarea>
-
-        <label>Category</label>
-        <select id="editar_category">
-            <option value="">Sin seleccionar</option>
-        </select>
-
-        <label>Price</label>
-        <input type="number" id="editar_price" placeholder="Precio" min="1">
-
-        <button id="btn_editar">Editar producto</button>
-    </div>
-
-    <br><br>
-
-    <div id="filtroBox" class="formulario">
-        <h1>Filtros</h1>
-        <label>Buscar producto</label>
-        <input type="text" id="filtrar_nombre" placeholder="Nombre del producto">
-
-        <label>Categoría</label>
-        <select id="filtrar_category">
-            <option value="">Sin seleccionar</option>
-        </select>
-
-        <label>Precio</label>
-        <div class="price_range">
-            <input type="number" placeholder="Precio mínimo" id="filtrar_min_price">
-            -
-            <input type="number" placeholder="Precio máximo" id="filtrar_max_price">
-        </div>
-
-        <button onclick="filtrarTabla()">Filtrar</button>
-    </div>
-
-    <br><br>
-
-    <div id="listaBox">
-        <h1>Lista de productos</h1>
-        <table id="lista">
+    <div id="carritoView">
+        <h1>Carrito</h1>
+        <table id="tablaCarrito">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>En carrito</th>
+                    <th>Producto</th>
+                    <th>Unidades</th>
+                    <th>Precio</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
-
-            <tbody id="tbody">
+            <tbody id="tbodyCarrito">
 
             </tbody>
         </table>
     </div>
 
-    <div id="loadingBackground" style="display: none;">
-        <div id="loadingIcon">
-            <p>PROCESANDO...</p>
+    <div id="tiendaView">
+        <button id="btnCrear" onclick="mostrarCrearProducto()">Crear producto</button>
+
+        <div id="crearBox">
+            <div class="formulario">
+                <h1>Crear producto</h1>
+                <label>Title</label>
+                <input type="text" placeholder="Título" id="crear_title" name="title">
+        
+                <label>Description</label>
+                <textarea name="description" id="crear_description" placeholder="Descripción"></textarea>
+        
+                <label>Category</label>
+                <select id="crear_category">
+                    <option value="">Sin seleccionar</option>
+                </select>
+        
+                <label>Price</label>
+                <input type="number" id="crear_price" placeholder="Precio" min="1">
+        
+                <button onclick="crearProducto()">Crear producto</button>
+            </div>
+        </div>
+    
+        <br><br>
+    
+        <div id="filtroBox" class="formulario">
+            <button id="btnUnsetFiltrando" onclick="unsetFiltrando()">X</button>
+    
+            <h1>Filtros</h1>
+            <label>Buscar producto</label>
+            <input type="text" id="filtrar_nombre" placeholder="Nombre del producto">
+    
+            <label>Categoría</label>
+            <select id="filtrar_category">
+                <option value="">Sin seleccionar</option>
+            </select>
+    
+            <label>Precio</label>
+            <div class="price_range">
+                <input type="number" min="0" placeholder="Precio mínimo" id="filtrar_min_price" value="0">
+                -
+                <input type="number" min="1" placeholder="Precio máximo" id="filtrar_max_price" value="1000">
+            </div>
+    
+            <button onclick="filtrarTabla()">Filtrar</button>
+        </div>
+    
+        <br><br>
+    
+        <div id="editarBox" style="display: none;" class="formulario">
+            <h1>Editar producto</h1>
+            <label>Title</label>
+            <input type="text" placeholder="Título" id="editar_title" name="title">
+    
+            <label>Description</label>
+            <textarea name="description" id="editar_description" placeholder="Descripción"></textarea>
+    
+            <label>Category</label>
+            <select id="editar_category">
+                <option value="">Sin seleccionar</option>
+            </select>
+    
+            <label>Price</label>
+            <input type="number" id="editar_price" placeholder="Precio" min="1">
+    
+            <button id="btn_editar">Editar producto</button>
+        </div>
+    
+        <br><br>
+    
+        <div id="listaBox">
+            <h1>Lista de productos</h1>
+            <table id="lista">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>En carrito</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+    
+                <tbody id="tbody">
+    
+                </tbody>
+            </table>
+        </div>
+    
+        <div id="loadingBackground" style="display: none;">
+            <div id="loadingIcon">
+                <p>PROCESANDO...</p>
+            </div>
+        </div>
+    
+        <div id="notificacion">Mensaje a mostrar</div>
+        <div id="notificacion_error" class="alert">Mensaje a mostrar</div>
+    
+        <br>
+    
+        <div id="makeErrorBox" onclick="makeError()">
+            <img src="https://cdn-icons-png.flaticon.com/512/4201/4201973.png" alt="">
+            <button>ERROR</button>
         </div>
     </div>
 
-    <div id="notificacion">Mensaje a mostrar</div>
-    <div id="notificacion_error" class="alert">Mensaje a mostrar</div>
-
-    <br>
+    <div id="darkBackground"></div>
 
     <script src="Categoria.js"></script>
     <script src="Producto.js"></script>

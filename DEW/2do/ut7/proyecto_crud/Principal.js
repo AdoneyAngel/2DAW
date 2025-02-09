@@ -1,11 +1,13 @@
 //Variables
 const tabla = document.getElementById("lista")
 const tbody = document.getElementById("tbody")
+const tbodyCarrito = document.getElementById("tbodyCarrito")
 const crear_title = document.getElementById("crear_title")
 const crear_description = document.getElementById("crear_description")
 const crear_price = document.getElementById("crear_price")
 const crear_category = document.getElementById("crear_category")
 const editar_title = document.getElementById("editar_title")
+const crearBox = document.getElementById("crearBox")
 const editar_description = document.getElementById("editar_description")
 const editar_price = document.getElementById("editar_price")
 const editar_category = document.getElementById("editar_category")
@@ -13,16 +15,20 @@ const editarBox = document.getElementById("editarBox")
 const loadingBackground = document.getElementById("loadingBackground")
 const notificacionBox = document.getElementById("notificacion")
 const notificacionErrorBox = document.getElementById("notificacion_error")
+const filtroBox = document.getElementById("filtroBox")
 const filtrar_name = document.getElementById("filtrar_nombre")
 const filtrar_category = document.getElementById("filtrar_category")
 const filtrar_min_price = document.getElementById("filtrar_min_price")
 const filtrar_max_price = document.getElementById("filtrar_max_price")
+const darkBackground = document.getElementById("darkBackground")
 
 let productosCargados = []
 let categoriasCargadas = []
 let max_price = 1000
 let pagina = 0
+let nProductosPagina = 10
 let cargandoPagina = false
+let filtrando = false
 
 
 
@@ -44,38 +50,45 @@ document.addEventListener("scroll", () => {//Detectar el scroll de la pagina
 
 
 //Métodos
-async function descargarProductos(pagina) {
+function setFiltrando() {
+    filtrando = true
+    filtroBox.className = "formulario filtrando"
+}
+function unsetFiltrando() {
+    filtrando = false
+    filtroBox.className = "formulario"
 
-    return fetch("https://dummyjson.com/products?limit=10&skip="+pagina)
+    cargarTabla(productosCargados)
+}
+
+async function descargarProductos(paginaProductos) {
+
+    return fetch(`https://dummyjson.com/products?limit=${nProductosPagina}&skip=${paginaProductos}`)
     .then(res => res.json())
     .then(productos => {
-
-        let newMax_price = 0
         
-        productosCargados = productos.products.map(productoActual => {
+        const productosDescargados = productos.products.map(productoActual => {
             const categoriaProducto = new Categoria(productoActual.category)
-            const productoClass = new Producto(productoActual.id, productoActual.title, productoActual.description, categoriaProducto, productoActual.price)
-            
-            if (productoActual.price > newMax_price) {
-                newMax_price = productoActual.price
+            const productoClass = new Producto(productoActual.id, productoActual.title, productoActual.description, categoriaProducto, productoActual.price, productoActual.stock)
+
+            const productoEnCarrito = buscarProductoCarritoCookie(productoClass.getId())
+
+            if (productoEnCarrito) {
+                productoClass.setStock(productoClass.getStock()-productoEnCarrito.unidades)
             }
 
             return productoClass
         })
 
-        max_price = newMax_price
-
-        filtrar_min_price.value = 0
-        filtrar_max_price.value = max_price
-
-        return productosCargados
+        return productosDescargados
     })
 }
 
 async function cargarSiguientePagina() {
-    pagina++
+    pagina += nProductosPagina
 
     return descargarProductos(pagina).then(productos => {
+        productosCargados = [...productosCargados, ...productos]
         productos.forEach(productoActual => añadirProductoTabla(productoActual))
 
         return true
@@ -97,15 +110,28 @@ function vaciarTabla() {
     registrosTabla.forEach(registro => registro.remove())
 }
 
-function añadirProductoTabla(producto) {
+async function añadirProductoTabla(producto) {
     const tr = document.createElement("tr")
     const td = document.createElement("td")
     const btnEliminar = document.createElement("button")
     const btnEditar = document.createElement("button")
     const btnAñadir = document.createElement("button")
 
+    if (filtrando) {//Si esta en estado de filtrado, insertara solo los productos que cumplan con dicho filtro
+        if (!cumpleFiltro(producto)) {
+            return false
+        }
+    }
+
+    const productoEnCookie = await buscarProductoCarrito(producto.getId())
+
+    if (productoEnCookie) {//Si el producto se encuentra en el carrito, se carga
+        producto = productoEnCookie
+    }
+
     btnAñadir.textContent = "Añadir al carrito"
     btnAñadir.id = "btnAñadir_tabla"
+    btnAñadir.addEventListener("click", () => guardarProductoCarrito(producto.id))
 
     btnEliminar.addEventListener("click", () => eliminarProducto(producto.getId()))
     btnEliminar.textContent = "Eliminar"
@@ -129,8 +155,11 @@ function añadirProductoTabla(producto) {
 
     td.innerHTML = producto.getPrice() + "€"
     tr.appendChild(td.cloneNode(true))
+    
+    td.innerHTML = producto.getStock() + " unidades"
+    tr.appendChild(td.cloneNode(true))
 
-    td.innerHTML = 0
+    td.innerHTML = producto.getEnCarrito()
     tr.appendChild(td.cloneNode(true))
 
     td.innerHTML = ""
@@ -148,6 +177,8 @@ function eliminarProducto(productoId) {
     productosCargados = productosCargados.filter(producto => producto.getId() != productoId)
 
     cargarTabla(productosCargados)
+
+    mostrarMensaje("Producto eliminado con éxito")
 }
 
 async function crearProducto() {
@@ -214,6 +245,10 @@ function validarCrear() {
         return "Debe seleccionar una categoría"
     }
 
+    if (buscarProductoTitle(crear_title.value)) {
+        return "El producto ya se encuentra registrado"
+    }
+
     return false
 }
 
@@ -243,6 +278,13 @@ function mostrarEditarProducto(producto) {
 async function editarProducto(productoId) {
     const btnEditar = document.getElementById("btn_editar")
 
+    const validacion = validarEditar(productoId)
+
+    if (!validacion !== true) {
+        mostrarError(validacion)
+        return false
+    }
+
     editarBox.style.display = "none"
 
     setLoading()
@@ -267,7 +309,7 @@ async function editarProducto(productoId) {
 
         const categoriaProducto = new Categoria(resultado.category)
 
-        const productoResultante = new Producto(productoId, resultado.title, resultado.description, categoriaProducto, resultado.price)
+        const productoResultante = new Producto(productoId, resultado.title, resultado.description, categoriaProducto, resultado.price, resultado.stock)
 
         //Modificar en la tabla y volver a cargarla
         productosCargados = productosCargados.map(producto => {
@@ -287,6 +329,31 @@ async function editarProducto(productoId) {
 
         return true
     })
+}
+
+function validarEditar(idProductoEditar) {
+    if (editar_title.value.length<1) {
+        return "Debe ingresar un título"
+    }
+
+    if (editar_description.value.length<1) {
+        return "Debe ingresar una descripción"
+    }
+
+    if (editar_price.value <= 0) {
+        return "Precio del producto inválido"
+    }
+
+    if (!editar_category.value.length) {
+        return "Debe seleccionar una categoría"
+    }
+
+    const productoRepetido = buscarProductoTitle(editar_title.value)
+    if (productoRepetido && productoRepetido.getId() != idProductoEditar) {
+        return "El producto ya se encuentra registrado"
+    }
+
+    return false
 }
 
 function mostrarMensaje(mensaje) {
@@ -314,29 +381,35 @@ function unsetLoading() {
 }
 
 function filtrarTabla() {
-    let productosFiltrados = [...productosCargados]
+    setFiltrando()
 
-    //nombre
+    const productosFiltrados = productosCargados.filter(productoActual => cumpleFiltro(productoActual))
+
+    cargarTabla(productosFiltrados)
+}
+
+function cumpleFiltro(producto) {
+    //Nombre
     if (filtrar_name.value.length) {
-        productosFiltrados = productosFiltrados.filter(productoActual => productoActual.getTitle().slice(0, filtrar_name.value.length).toLowerCase() == filtrar_name.value.toLowerCase())
-
-        filtrar_name.value = ""
+        if (producto.getTitle().slice(0, filtrar_name.value.length).toLowerCase() != filtrar_name.value.toLowerCase()) {
+            return false
+        }
     }
 
     //categoria
     const categoriaSeleccionada = filtrar_category.options[filtrar_category.selectedIndex].value
-    
     if (categoriaSeleccionada.length) {
-        productosFiltrados = productosFiltrados.filter(productoActual => productoActual.getCategory().getName() == categoriaSeleccionada)
+        if (producto.getCategory().getName() != categoriaSeleccionada) {
+            return false
+        }
     }
 
-    //precio
-    productosFiltrados = productosFiltrados.filter(productoActual => productoActual.getPrice() >= filtrar_min_price.value && productoActual.getPrice() <= filtrar_max_price.value)
-
-    filtrar_min_price.value = 0
-    filtrar_max_price.value = max_price
-
-    cargarTabla(productosFiltrados)
+    //Precio 
+    if (producto.getPrice() < filtrar_min_price.value || producto.getPrice() > filtrar_max_price.value) {
+        return false
+    }
+    
+    return true
 }
 
 async function descargarCategorias() {
@@ -367,17 +440,256 @@ function cargarCategorias(categorias) {
 }
 
 function añadirCookie(nombre, valor) {
-    document.cookie = "nombre=valor; path=/; max-age=3600";
-    console.log(document.cookie)
+    document.cookie = nombre+"="+valor+";";
 }
 
-añadirCookie("pr", "1111")
+function getCookie(nombre) {
+    const cookies = document.cookie
+    
+    const cookiesDiv = cookies.split(";")
+    
+    let value = null
 
+    cookiesDiv.forEach(cookie => {
+        const cookieDiv = cookie.split("=")
+        const cookieValue = cookieDiv[1]
+        const cookieNombre = cookieDiv[0]
+
+        if (cookieNombre.trim() == nombre) {
+            value = cookieValue
+        }
+    })
+
+    return value
+}
+
+async function makeError() {
+    await fetch("https://dummyjson.com/products", {
+        method: "put",
+        body: new URLSearchParams()
+    })
+    .then(res => res.json())
+    .then(respuesta => respuesta)
+    .catch(error => {
+        mostrarError(`Error: ${error}`)
+    })
+}
+
+async function buscarProductoCarrito(id) {
+    const carrito = await getCarrito()
+
+    if (!carrito) {
+        return null
+    }
+
+    const producto = await buscarProducto(id)
+
+    return producto
+}
+
+async function getCarrito() {
+    let productos = []
+
+    const carritoCookie = getCookie("carrito")
+
+    if (!carritoCookie) {
+        return []
+    }
+
+    carritoProductosDiv = carritoCookie.split(",")
+
+    carritoProductosDiv.forEach(async productoCookie => {
+        if (productoCookie) {
+            const productoDiv = productoCookie.split("_")
+
+            const productoId = productoDiv[0]
+            const productoUnidades = Number(productoDiv[1])
+            
+            let producto = await buscarProducto(productoId)
+
+            if (producto) {
+                producto.setEnCarrito(productoUnidades)
+    
+                productos.push(producto)
+            }
+        }
+    })
+
+    return productos
+}
+
+async function buscarProducto(id) {
+    let producto = productosCargados.find(productoActual => productoActual.getId() == id)
+
+    if (!producto) {//Si no lo encuentra de forma local, buscara en la api
+        const respuesta = await fetch("https://dummyjson.com/products/"+id)
+        const respuestaJson = await respuesta.json()
+
+        const productoApi = new Producto(
+            respuestaJson.id, 
+            respuestaJson.title, 
+            respuestaJson.description,
+            respuestaJson.category,
+            respuestaJson.price,
+            respuestaJson.stock
+            )
+
+        producto = productoApi
+
+    }
+
+    return producto
+}
+
+function buscarProductoTitle(title) {
+    const producto = productosCargados.find(productoActual => productoActual.getTitle().toLowerCase() == title.toLowerCase())
+
+    return producto
+}
+
+function guardarProductoCarrito(id) {
+    //Cambiar unidades en la lista local
+    productosCargados.forEach(productoActual => {
+        if(productoActual.id == id) {
+            if (productoActual.getStock()) {
+                productoActual.setStock(productoActual.getStock()-1)
+                productoActual.setEnCarrito(Number(productoActual.getEnCarrito())+1)
+
+            } else {
+                mostrarError("Se ha agotado las unidades de este producto")
+            }
+        }
+    })
+
+    //Se genera el string del carrito
+    const carritoString = genCarritoCookieValue()
+
+    añadirCookie("carrito", carritoString)
+
+    cargarTabla(productosCargados)
+    cargarProductosCarrito()
+}
+
+function genCarritoCookieValue() {
+    let cookieValue = ""
+
+    productosCargados.forEach(productoActual => {
+        if (Number(productoActual.getEnCarrito())) {
+            cookieValue += `${productoActual.getId()}_${productoActual.getEnCarrito()},`
+        }
+    })
+
+    return cookieValue
+}
+
+async function cargarProductosCarrito() {
+    vaciarProductosCarrito()
+
+    const carrito = await getCarrito()
+
+    // console.log(carrito)
+    // console.log(carrito.length)
+
+    if (!carrito) {
+        return false
+    }
+
+    carrito.forEach(producto => {
+        const tr = document.createElement("tr")
+        const td = document.createElement("td")
+
+        td.innerHTML = producto.getTitle()
+        tr.appendChild(td.cloneNode(true))
+        
+        td.innerHTML = producto.getEnCarrito()
+        tr.appendChild(td.cloneNode(true))
+
+        td.innerHTML = producto.getPrice()*producto.getEnCarrito() + "€"
+        tr.appendChild(td.cloneNode(true))
+
+        tbodyCarrito.appendChild(tr)
+    })
+}
+
+function vaciarProductosCarrito() {
+    const filas = document.querySelectorAll("#tbodyCarrito > tr")
+
+    filas.forEach(fila => fila.remove())
+}
+
+function actualizarProductosStock() {
+    productosCargados.forEach(productoActual => {
+        const productoCarrito = buscarProductoCarrito(productoActual.getId())
+
+        if (productoCarrito) {
+            productoActual.setStock(productoActual.getStock()-productoCarrito.getEnCarrito())
+        }
+    })
+}
+
+function buscarProductoCarritoCookie(id) {
+    let productoEncontrado = null
+    const carritoCookie = getCookie("carrito")
+
+    if (!carritoCookie) {
+        return null
+    }
+
+    const carritoDiv = carritoCookie.split(",")
+
+    carritoDiv.forEach(productoCookie => {
+        const productoDiv = productoCookie.split("_")
+
+        const productoId = productoDiv[0]
+        const productoUnidades = productoDiv[1]
+
+        if (id == productoId) {
+            const productoBasico = {
+                id: productoId,
+                unidades: productoUnidades
+            }
+    
+            productoEncontrado = productoBasico
+        }
+    })
+
+    return productoEncontrado
+}
+
+function mostrarCrearProducto() {
+    crearBox.style.display = "flex"
+
+    showDarkedWindow(crearBox.id, ocultarCrearProducto)
+}
+function ocultarCrearProducto() {
+    crearBox.style.display = "none"
+
+    hiddeDarkedWindow(crearBox.id)
+}
+
+function showDarkedWindow(idBox, close) {
+    const box = document.getElementById(idBox)
+        
+    darkBackground.style.display = "block"
+    darkBackground.onclick = () => close()
+    box.style.zIndex = 10
+
+}
+function hiddeDarkedWindow(idBox) {
+    const box = document.getElementById(idBox)
+        
+    darkBackground.style.display = "none"
+    box.style.zIndex = 1
+
+}
 
 
 
 //Métodos iniciales
 descargarProductos(0).then(productos => {//Descargar los productos y posteriormente cargar la tabla
+    productosCargados = productos
+
+    cargarProductosCarrito()
     cargarTabla(productos)
 })
 descargarCategorias().then(categorias => {

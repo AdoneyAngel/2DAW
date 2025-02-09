@@ -43,6 +43,7 @@
             justify-content: center;
             align-items: center;
             border-left: 3px solid var(--dark);
+            position: relative;
         }
         #loadingBackground {
             background: rgba(0, 0, 0, .3);
@@ -83,6 +84,7 @@
             animation-delay: 0s;
             display: none;
             cursor: pointer;
+            z-index: 15;
         }
         #notificacion_error {
             background-color: var(--orange);
@@ -196,7 +198,7 @@
             resize: none;
             font-size: 1rem;
         }
-        #crearBox {
+        .floatingBox {
             background: var(--dark);
             padding-top: 30px;
             padding-bottom: 40px;
@@ -215,7 +217,7 @@
             opacity: 1;
             animation: crearBoxAni .2s ease-out;
         }
-        #crearBox input, #crearBox textarea, #crearBox select {
+        .floatingBox input, .floatingBox textarea, .floatingBox select {
             margin-bottom: 5px;
             resize: none;
             font-size: 1rem;
@@ -223,18 +225,18 @@
             border-color: var(--darker);
             color: white;
         }
-        #crearBox input::placeholder, #crearBox textarea::placeholder {
+        .floatingBox input::placeholder, .floatingBox textarea::placeholder {
             color: #dfdfdf;
         }
-        #crearBox label {
+        .floatingBox label {
             color: #d3d3d3;
         }
-        #crearBox button {
+        .floatingBox button {
             background: var(--grey);
             margin: 10px 0;
             margin-top: 25px;
         }
-        #crearBox option {
+        .floatingBox option {
             background: var(--darker);
         }
         h1 {
@@ -286,7 +288,7 @@
             font-weight: bold;
             color: var(--grey);
             position: absolute;
-            top: 25px;
+            top: 0px;
             right: 25px;
             padding: 0;
             display: none;
@@ -320,7 +322,6 @@
             animation: darkBackgroundAni .2s ease-out;
         }
         #btnCrear {
-            margin-top: 20px;
             padding: 10px 15px;
             border-radius: 5px;
             border: none;
@@ -329,6 +330,68 @@
             font-weight: bold;
             background: var(--green);
             cursor: pointer;
+            position: sticky;
+            margin-right: calc(100% - 40px);
+            transform: translateX(50%);
+            top: 20px;
+            left: 20px;
+            width: max-content;
+            z-index: 2;
+        }
+        .btnRounded {
+            padding: 2px;
+            border-radius: 100%;
+            width: 30px;
+            height: 30px;
+            margin: 5px auto;
+            font-weight: bold;
+            font-size: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .btnRounded p {
+            height: 100%;
+        }
+        .btnRounded.red {
+            background: var(--red);
+            color: white;
+        }
+        .btnRounded.green {
+            background: var(--green);
+        }
+        #floatingInput {
+            display: none;
+            position: fixed;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--dark);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        #floatingInput h2 {
+            margin-bottom: 20px;
+        }
+        #floatingInput input {
+            background: var(--grey);
+            padding: 5px 15px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+        #floatingInput button {
+            background: white;
+            border: none;
+            border-radius: 5px;
+            padding: 3px 10px;
+            cursor: pointer;
+            margin-left: auto;
+            display: block;
         }
 
         @keyframes notificacionAni {
@@ -386,7 +449,7 @@
     <div id="tiendaView">
         <button id="btnCrear" onclick="mostrarCrearProducto()">Crear producto</button>
 
-        <div id="crearBox">
+        <div id="crearBox" class="floatingBox">
             <div class="formulario">
                 <h1>Crear producto</h1>
                 <label>Title</label>
@@ -433,23 +496,25 @@
     
         <br><br>
     
-        <div id="editarBox" style="display: none;" class="formulario">
-            <h1>Editar producto</h1>
-            <label>Title</label>
-            <input type="text" placeholder="Título" id="editar_title" name="title">
-    
-            <label>Description</label>
-            <textarea name="description" id="editar_description" placeholder="Descripción"></textarea>
-    
-            <label>Category</label>
-            <select id="editar_category">
-                <option value="">Sin seleccionar</option>
-            </select>
-    
-            <label>Price</label>
-            <input type="number" id="editar_price" placeholder="Precio" min="1">
-    
-            <button id="btn_editar">Editar producto</button>
+        <div id="editarBox" style="display: none;" class="floatingBox">
+            <div class="formulario">
+                <h1>Editar producto</h1>
+                <label>Title</label>
+                <input type="text" placeholder="Título" id="editar_title" name="title">
+        
+                <label>Description</label>
+                <textarea name="description" id="editar_description" placeholder="Descripción"></textarea>
+        
+                <label>Category</label>
+                <select id="editar_category">
+                    <option value="">Sin seleccionar</option>
+                </select>
+        
+                <label>Price</label>
+                <input type="number" id="editar_price" placeholder="Precio" min="1">
+        
+                <button id="btn_editar">Editar producto</button>
+            </div>
         </div>
     
         <br><br>
@@ -491,6 +556,12 @@
             <img src="https://cdn-icons-png.flaticon.com/512/4201/4201973.png" alt="">
             <button>ERROR</button>
         </div>
+    </div>
+
+    <div id="floatingInput">
+        <h2>Texto mensaje</h2>
+        <input type="text" placeholder="Numero">
+        <button>Accion</button>
     </div>
 
     <div id="darkBackground"></div>

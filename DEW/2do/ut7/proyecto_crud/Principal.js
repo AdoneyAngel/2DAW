@@ -21,9 +21,11 @@ const filtrar_category = document.getElementById("filtrar_category")
 const filtrar_min_price = document.getElementById("filtrar_min_price")
 const filtrar_max_price = document.getElementById("filtrar_max_price")
 const darkBackground = document.getElementById("darkBackground")
+const floatingInput = document.getElementById("floatingInput")
 
 let productosCargados = []
 let categoriasCargadas = []
+let carritoCargado = []
 let max_price = 1000
 let pagina = 0
 let nProductosPagina = 10
@@ -181,53 +183,6 @@ function eliminarProducto(productoId) {
     mostrarMensaje("Producto eliminado con éxito")
 }
 
-async function crearProducto() {
-    const validar = validarCrear()
-
-    if (validar) {//Si la validación retorna algun error, da una alerta y para
-        mostrarError(validar)
-        return false
-    }
-
-    const categoriaSeleccionada = crear_category.options[crear_category.selectedIndex].value
-    const categoriaClass = new Categoria(categoriaSeleccionada)
-
-    nuevoProducto = new Producto(-1, crear_title.value, crear_description.value, categoriaClass, crear_price.value)
-
-    setLoading()
-
-    fetch("https://dummyjson.com/products/add", {
-        method: "POST",
-        body: nuevoProducto.getURLSearchParams()
-
-    }).then(res => res.json())
-    .then(result => {
-        const categoriaProducto = new Categoria(result.category)
-        const productoAñadido = new Producto(
-            result.id,
-            result.title,
-            result.description,
-            categoriaProducto,
-            result.price
-        )
-
-        añadirProductoTabla(productoAñadido)
-
-        productosCargados.push(productoAñadido)
-
-        mostrarMensaje("Producto añadido correctamente")
-
-    })
-    .finally(() => {
-        crear_title.value = ""
-        crear_description.value = ""
-        crear_price.value = ""
-
-        unsetLoading()
-    })
-    
-}
-
 function validarCrear() {
     if (crear_title.value.length<1) {
         return "Debe ingresar un título"
@@ -273,10 +228,24 @@ function mostrarEditarProducto(producto) {
     }
 
     btnEditar.onclick = () => editarProducto(producto.getId())
+
+    showDarkedWindow(editarBox.id, ocultarEditarProducto)
+}
+
+function ocultarEditarProducto() {
+        const btnEditar = document.getElementById("btn_editar")
+
+        //Se resetea los campos
+        editarBox.style.display = "none"
+        editar_title.value = ""
+        editar_description.value = ""
+        editar_price.value = 0
+        btnEditar.onclick = null
+
+        hiddeDarkedWindow(editarBox.id)
 }
 
 async function editarProducto(productoId) {
-    const btnEditar = document.getElementById("btn_editar")
 
     const validacion = validarEditar(productoId)
 
@@ -284,8 +253,6 @@ async function editarProducto(productoId) {
         mostrarError(validacion)
         return false
     }
-
-    editarBox.style.display = "none"
 
     setLoading()
 
@@ -301,11 +268,8 @@ async function editarProducto(productoId) {
     })
     .then(res => res.json())
     .then(resultado => {
-        //Se resetea los campos
-        editar_title.value = ""
-        editar_description.value = ""
-        editar_price.value = 0
-        btnEditar.onclick = null
+
+        ocultarEditarProducto()
 
         const categoriaProducto = new Categoria(resultado.category)
 
@@ -482,9 +446,19 @@ async function buscarProductoCarrito(id) {
         return null
     }
 
-    const producto = await buscarProducto(id)
+    const producto = buscarProductoCarritoLocal(id)
 
     return producto
+}
+
+function buscarProductoCarritoLocal(id) {
+    carritoCargado.forEach(productoActual => {
+        if (productoActual.getId() == id) {
+            return productoActual
+        }
+    })
+
+    return null
 }
 
 async function getCarrito() {
@@ -498,14 +472,18 @@ async function getCarrito() {
 
     carritoProductosDiv = carritoCookie.split(",")
 
-    carritoProductosDiv.forEach(async productoCookie => {
+    await carritoProductosDiv.forEach(async productoCookie => {
         if (productoCookie) {
             const productoDiv = productoCookie.split("_")
 
             const productoId = productoDiv[0]
             const productoUnidades = Number(productoDiv[1])
             
-            let producto = await buscarProducto(productoId)
+            let producto = buscarProductoCarritoLocal(productoId)
+
+            if (!producto) {//Si no está en el carrito cargado, se busca entre los productos y la api
+                producto = await buscarProducto(productoId)
+            }
 
             if (producto) {
                 producto.setEnCarrito(productoUnidades)
@@ -514,6 +492,11 @@ async function getCarrito() {
             }
         }
     })
+
+    console.log(productos.length)
+    console.log("Retornando: " + (new Date()).getMilliseconds())
+
+    carritoCargado = productos
 
     return productos
 }
@@ -531,12 +514,16 @@ async function buscarProducto(id) {
             respuestaJson.description,
             respuestaJson.category,
             respuestaJson.price,
-            respuestaJson.stock
-            )
+            respuestaJson.stock)
 
         producto = productoApi
 
+        console.log("Buscar api:"+producto.getId() + " " + (new Date()).getMilliseconds())
+
+        return producto
     }
+
+    console.log("Buscar local: " + (new Date()).getMilliseconds())
 
     return producto
 }
@@ -547,21 +534,51 @@ function buscarProductoTitle(title) {
     return producto
 }
 
-function guardarProductoCarrito(id) {
+async function guardarProductoCarrito(id, unidades = 1) {
+    let existeEnCarrito = false
     //Cambiar unidades en la lista local
-    productosCargados.forEach(productoActual => {
+    carritoCargado.forEach(async productoActual => {
         if(productoActual.id == id) {
-            if (productoActual.getStock()) {
-                productoActual.setStock(productoActual.getStock()-1)
-                productoActual.setEnCarrito(Number(productoActual.getEnCarrito())+1)
+            if (productoActual.getStock() >= unidades) {
+                productoActual.setStock(productoActual.getStock()-unidades)
+                productoActual.setEnCarrito(Number(productoActual.getEnCarrito())+unidades)
+
+                existeEnCarrito = true
 
             } else {
+                existeEnCarrito = true
                 mostrarError("Se ha agotado las unidades de este producto")
             }
+
         }
     })
 
+    if (!existeEnCarrito) {
+        const productoLocal = await buscarProducto(id)
+        productoLocal.setStock(productoLocal.getStock()-1)
+        productoLocal.setEnCarrito(Number(productoLocal.getEnCarrito())+1)
+
+        carritoCargado.push(productoLocal)
+    }
+
     //Se genera el string del carrito
+    const carritoString = genCarritoCookieValue()
+
+    añadirCookie("carrito", carritoString)
+
+    cargarTabla(productosCargados)
+    cargarProductosCarrito()
+}
+
+function reducirProductoCarrito(id, unidades = 1) {
+    carritoCargado.forEach(productoActual => {
+        if (productoActual.getId() == id) {
+            productoActual.setStock(productoActual.getStock()+unidades)
+            productoActual.setEnCarrito(productoActual.getEnCarrito()-unidades)
+        }
+
+    })
+
     const carritoString = genCarritoCookieValue()
 
     añadirCookie("carrito", carritoString)
@@ -573,7 +590,7 @@ function guardarProductoCarrito(id) {
 function genCarritoCookieValue() {
     let cookieValue = ""
 
-    productosCargados.forEach(productoActual => {
+    carritoCargado.forEach(productoActual => {
         if (Number(productoActual.getEnCarrito())) {
             cookieValue += `${productoActual.getId()}_${productoActual.getEnCarrito()},`
         }
@@ -587,8 +604,7 @@ async function cargarProductosCarrito() {
 
     const carrito = await getCarrito()
 
-    // console.log(carrito)
-    // console.log(carrito.length)
+    console.log("Cargando: " + (new Date()).getMilliseconds())
 
     if (!carrito) {
         return false
@@ -597,6 +613,16 @@ async function cargarProductosCarrito() {
     carrito.forEach(producto => {
         const tr = document.createElement("tr")
         const td = document.createElement("td")
+        const btnAñadir = document.createElement("button")
+        const btnReducir = document.createElement("button")
+
+        btnAñadir.innerHTML = "<p>+</p>"
+        btnAñadir.onclick = () => guardarProductoCarrito(producto.getId())
+        btnAñadir.className = "btnRounded green"
+        
+        btnReducir.innerHTML = "<p>-</p>"
+        btnReducir.onclick = () => reducirProductoCarrito(producto.getId())
+        btnReducir.className = "btnRounded red"
 
         td.innerHTML = producto.getTitle()
         tr.appendChild(td.cloneNode(true))
@@ -604,8 +630,13 @@ async function cargarProductosCarrito() {
         td.innerHTML = producto.getEnCarrito()
         tr.appendChild(td.cloneNode(true))
 
-        td.innerHTML = producto.getPrice()*producto.getEnCarrito() + "€"
+        td.innerHTML = (producto.getPrice()*producto.getEnCarrito()).toFixed(2) + "€"
         tr.appendChild(td.cloneNode(true))
+
+        td.innerHTML = ""
+        td.appendChild(btnAñadir)
+        td.appendChild(btnReducir)
+        tr.appendChild(td)
 
         tbodyCarrito.appendChild(tr)
     })
@@ -656,6 +687,54 @@ function buscarProductoCarritoCookie(id) {
     return productoEncontrado
 }
 
+async function crearProducto() {
+    const validar = validarCrear()
+
+    if (validar) {//Si la validación retorna algun error, da una alerta y para
+        mostrarError(validar)
+        return false
+    }
+
+    const categoriaSeleccionada = crear_category.options[crear_category.selectedIndex].value
+    const categoriaClass = new Categoria(categoriaSeleccionada)
+
+    nuevoProducto = new Producto(-1, crear_title.value, crear_description.value, categoriaClass, crear_price.value)
+
+    setLoading()
+
+    fetch("https://dummyjson.com/products/add", {
+        method: "POST",
+        body: nuevoProducto.getURLSearchParams()
+
+    }).then(res => res.json())
+    .then(result => {
+        const categoriaProducto = new Categoria(result.category)
+        const productoAñadido = new Producto(
+            result.id,
+            result.title,
+            result.description,
+            categoriaProducto,
+            result.price
+        )
+
+        añadirProductoTabla(productoAñadido)
+
+        productosCargados.push(productoAñadido)
+
+        mostrarMensaje("Producto añadido correctamente")
+
+    })
+    .finally(() => {
+        crear_title.value = ""
+        crear_description.value = ""
+        crear_price.value = ""
+
+        ocultarCrearProducto()
+        unsetLoading()
+    })
+    
+}
+
 function mostrarCrearProducto() {
     crearBox.style.display = "flex"
 
@@ -665,6 +744,39 @@ function ocultarCrearProducto() {
     crearBox.style.display = "none"
 
     hiddeDarkedWindow(crearBox.id)
+}
+
+function showFloatingInput(title, inputType, idProducto, action) {
+    const input = document.querySelector("#floatingInput input")
+    const inputTitle = document.querySelector("#floatingInput h2")
+    const button = document.querySelector("#floatinInput button")
+
+    input.placeholder = title
+    input.type = inputType
+
+    inputTitle.innerHTML = title
+
+    button.onclick = () => {
+        action(idProducto, input.value)
+        hiddeFloatingInput()
+    }
+
+    showDarkedWindow(floatingInput)
+}
+
+function hiddeFloatingInput() {
+    const input = document.querySelector("#floatingInput input")
+    const inputTitle = document.querySelector("#floatingInput h2")
+    const button = document.querySelector("#floatinInput button")
+
+    input.placeholder = ""
+    input.type = ""
+
+    inputTitle.innerHTML = title
+
+    button.onclick = null
+
+    hiddeDarkedWindow(floatingInput.id)
 }
 
 function showDarkedWindow(idBox, close) {
@@ -686,7 +798,7 @@ function hiddeDarkedWindow(idBox) {
 
 
 //Métodos iniciales
-descargarProductos(0).then(productos => {//Descargar los productos y posteriormente cargar la tabla
+descargarProductos(0).then(async productos => {//Descargar los productos y carrito y posteriormente cargar la tabla
     productosCargados = productos
 
     cargarProductosCarrito()

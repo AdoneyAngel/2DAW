@@ -133,7 +133,9 @@ async function añadirProductoTabla(producto) {
 
     btnAñadir.textContent = "Añadir al carrito"
     btnAñadir.id = "btnAñadir_tabla"
-    btnAñadir.addEventListener("click", () => guardarProductoCarrito(producto.id))
+    btnAñadir.addEventListener("click", () => {
+        showFloatingInput("Agregar al carrito", "number", (unidades) => guardarProductoCarrito(producto.id, unidades))
+    })
 
     btnEliminar.addEventListener("click", () => eliminarProducto(producto.getId()))
     btnEliminar.textContent = "Eliminar"
@@ -536,6 +538,13 @@ function buscarProductoTitle(title) {
 
 async function guardarProductoCarrito(id, unidades = 1) {
     let existeEnCarrito = false
+    unidades = Number(unidades)
+
+    if (unidades < 0) {//No puede agregar unidades negativas
+        mostrarError("Número de unidades inválido")
+        return false
+    }
+
     //Cambiar unidades en la lista local
     carritoCargado.forEach(async productoActual => {
         if(productoActual.id == id) {
@@ -547,7 +556,7 @@ async function guardarProductoCarrito(id, unidades = 1) {
 
             } else {
                 existeEnCarrito = true
-                mostrarError("Se ha agotado las unidades de este producto")
+                mostrarError("No hay unidades suficientes")
             }
 
         }
@@ -571,10 +580,24 @@ async function guardarProductoCarrito(id, unidades = 1) {
 }
 
 function reducirProductoCarrito(id, unidades = 1) {
+    unidades = Number(unidades)
+
+    if (unidades < 0) {//No puede reducir unidades negativas
+        mostrarError("Número de unidades inválido")
+        return false
+    }
+
     carritoCargado.forEach(productoActual => {
         if (productoActual.getId() == id) {
-            productoActual.setStock(productoActual.getStock()+unidades)
-            productoActual.setEnCarrito(productoActual.getEnCarrito()-unidades)
+            //Si las undades es mayor o igual a la cantidad en carrito, se boora
+            if (unidades >= productoActual.getEnCarrito()) {
+                productoActual.setStock(productoActual.getStock()+productoActual.getEnCarrito())
+                productoActual.setEnCarrito(0)
+
+            } else {
+                productoActual.setStock(productoActual.getStock()+unidades)
+                productoActual.setEnCarrito(productoActual.getEnCarrito()-unidades)                
+            }
         }
 
     })
@@ -591,7 +614,7 @@ function genCarritoCookieValue() {
     let cookieValue = ""
 
     carritoCargado.forEach(productoActual => {
-        if (Number(productoActual.getEnCarrito())) {
+        if (Number(productoActual.getEnCarrito()) > 0) {
             cookieValue += `${productoActual.getId()}_${productoActual.getEnCarrito()},`
         }
     })
@@ -617,11 +640,19 @@ async function cargarProductosCarrito() {
         const btnReducir = document.createElement("button")
 
         btnAñadir.innerHTML = "<p>+</p>"
-        btnAñadir.onclick = () => guardarProductoCarrito(producto.getId())
+        
+        btnAñadir.onclick = () => {
+            showFloatingInput("Agregar al carrito", "number", (unidades) => guardarProductoCarrito(producto.getId(), unidades))
+        }
+
         btnAñadir.className = "btnRounded green"
         
         btnReducir.innerHTML = "<p>-</p>"
-        btnReducir.onclick = () => reducirProductoCarrito(producto.getId())
+        
+        btnReducir.onclick = () => {
+            showFloatingInput("Quitar del carrito", "number", (unidades) => reducirProductoCarrito(producto.getId(), unidades))
+        }
+
         btnReducir.className = "btnRounded red"
 
         td.innerHTML = producto.getTitle()
@@ -746,10 +777,10 @@ function ocultarCrearProducto() {
     hiddeDarkedWindow(crearBox.id)
 }
 
-function showFloatingInput(title, inputType, idProducto, action) {
+function showFloatingInput(title, inputType, action) {
     const input = document.querySelector("#floatingInput input")
     const inputTitle = document.querySelector("#floatingInput h2")
-    const button = document.querySelector("#floatinInput button")
+    const button = document.querySelector("#floatingInput button")
 
     input.placeholder = title
     input.type = inputType
@@ -757,24 +788,28 @@ function showFloatingInput(title, inputType, idProducto, action) {
     inputTitle.innerHTML = title
 
     button.onclick = () => {
-        action(idProducto, input.value)
+        action(input.value)
         hiddeFloatingInput()
     }
 
-    showDarkedWindow(floatingInput)
+    floatingInput.style.display = "block"
+
+    showDarkedWindow(floatingInput.id, hiddeFloatingInput)
 }
 
 function hiddeFloatingInput() {
     const input = document.querySelector("#floatingInput input")
     const inputTitle = document.querySelector("#floatingInput h2")
-    const button = document.querySelector("#floatinInput button")
+    const button = document.querySelector("#floatingInput button")
 
     input.placeholder = ""
     input.type = ""
 
-    inputTitle.innerHTML = title
+    inputTitle.innerHTML = ""
 
-    button.onclick = null
+    button.onclick = "null"
+
+    floatingInput.style.display = "none"
 
     hiddeDarkedWindow(floatingInput.id)
 }

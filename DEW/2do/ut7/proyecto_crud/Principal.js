@@ -2,16 +2,6 @@
 const tabla = document.getElementById("lista")
 const tbody = document.getElementById("tbody")
 const tbodyCarrito = document.getElementById("tbodyCarrito")
-const crear_title = document.getElementById("crear_title")
-const crear_description = document.getElementById("crear_description")
-const crear_price = document.getElementById("crear_price")
-const crear_category = document.getElementById("crear_category")
-const editar_title = document.getElementById("editar_title")
-const crearBox = document.getElementById("crearBox")
-const editar_description = document.getElementById("editar_description")
-const editar_price = document.getElementById("editar_price")
-const editar_category = document.getElementById("editar_category")
-const editarBox = document.getElementById("editarBox")
 const loadingBackground = document.getElementById("loadingBackground")
 const notificacionBox = document.getElementById("notificacion")
 const notificacionErrorBox = document.getElementById("notificacion_error")
@@ -23,6 +13,10 @@ const filtrar_max_price = document.getElementById("filtrar_max_price")
 const darkBackground = document.getElementById("darkBackground")
 const floatingInput = document.getElementById("floatingInput")
 const carritoView = document.getElementById("carritoView")
+const confirmBox = document.getElementById("confirm")
+const confirmBtnConfirmar = document.getElementById("confirm-confirmar")
+const confirmBtnCancelar = document.getElementById("confirm-cancelar")
+const confirmTitle = document.getElementById("confirm-title")
 
 let productosCargados = []
 let categoriasCargadas = []
@@ -138,7 +132,10 @@ async function añadirProductoTabla(producto) {
         showFloatingInput("Agregar al carrito", "number", (unidades) => guardarProductoCarrito(producto.id, unidades))
     })
 
-    btnEliminar.addEventListener("click", () => eliminarProducto(producto.getId()))
+    btnEliminar.addEventListener("click", () => {//Preguntar si realmente desea eliminar el producto
+        showConfirm("¿Seguro desea eliminar el producto?", () => eliminarProducto(producto.getId()))
+    })
+
     btnEliminar.textContent = "Eliminar"
     btnEliminar.id = "btnEliminar_tabla"
 
@@ -182,145 +179,23 @@ function eliminarProducto(productoId) {
     productosCargados = productosCargados.filter(producto => producto.getId() != productoId)
 
     cargarTabla(productosCargados)
+    cargarProductosCarrito()
 
     mostrarMensaje("Producto eliminado con éxito")
 }
 
-function validarCrear() {
-    if (crear_title.value.length<1) {
-        return "Debe ingresar un título"
-    }
-
-    if (crear_description.value.length<1) {
-        return "Debe ingresar una descripción"
-    }
-
-    if (crear_price.value <= 0) {
-        return "Precio del producto inválido"
-    }
-
-    if (!crear_category.value.length) {
-        return "Debe seleccionar una categoría"
-    }
-
-    if (buscarProductoTitle(crear_title.value)) {
-        return "El producto ya se encuentra registrado"
-    }
-
-    return false
-}
-
 function mostrarEditarProducto(producto) {
-    const btnEditar = document.getElementById("btn_editar")
+    //Generar cookie para la otra página
+    const editarCookieString = genEditarCookie(producto)
+    añadirCookie("editar", editarCookieString)
 
-    editarBox.style.display = "flex"
-
-    editar_title.value = producto.getTitle()
-    editar_description.value = producto.getDescription()
-    editar_price.value = producto.getPrice()
-
-    //Establecer la categoría seleccionado
-    for (let optIndex = 0; optIndex<editar_category.options.length; optIndex++) {
-        const optActual = editar_category.options[optIndex]
-        if (optActual.value == producto.getCategory().getName()) {
-            optActual.selected = true
-
-        } else {
-            optActual.selected = false
-        } 
-    }
-
-    btnEditar.onclick = () => editarProducto(producto.getId())
-
-    showDarkedWindow(editarBox.id, ocultarEditarProducto)
+    window.location = "editarProducto.html"
 }
 
-function ocultarEditarProducto() {
-        const btnEditar = document.getElementById("btn_editar")
+function genEditarCookie(producto) {
+    string = `${producto.getId()}_${producto.getTitle()}_${producto.getDescription()}_${producto.getPrice()}_${producto.getCategory()}_${producto.getStock()}`
 
-        //Se resetea los campos
-        editarBox.style.display = "none"
-        editar_title.value = ""
-        editar_description.value = ""
-        editar_price.value = 0
-        btnEditar.onclick = null
-
-        hiddeDarkedWindow(editarBox.id)
-}
-
-async function editarProducto(productoId) {
-
-    const validacion = validarEditar(productoId)
-
-    if (!validacion !== true) {
-        mostrarError(validacion)
-        return false
-    }
-
-    setLoading()
-
-    return fetch("https://dummyjson.com/products/"+productoId, {
-        method: "PUT",
-        body: new URLSearchParams({
-            title: editar_title.value,
-            description: editar_description.value,
-            category: editar_category.options[editar_category.selectedIndex].value,
-            price: editar_price.value,
-        })
-
-    })
-    .then(res => res.json())
-    .then(resultado => {
-
-        ocultarEditarProducto()
-
-        const categoriaProducto = new Categoria(resultado.category)
-
-        const productoResultante = new Producto(productoId, resultado.title, resultado.description, categoriaProducto, resultado.price, resultado.stock)
-
-        //Modificar en la tabla y volver a cargarla
-        productosCargados = productosCargados.map(producto => {
-            if (producto.getId() == productoId) {
-                return productoResultante
-            }
-            return producto
-        })
-
-        cargarTabla(productosCargados)
-
-        mostrarMensaje("Producto modificado exitosamente")
-        
-    })
-    .finally(() => {        
-        unsetLoading()
-
-        return true
-    })
-}
-
-function validarEditar(idProductoEditar) {
-    if (editar_title.value.length<1) {
-        return "Debe ingresar un título"
-    }
-
-    if (editar_description.value.length<1) {
-        return "Debe ingresar una descripción"
-    }
-
-    if (editar_price.value <= 0) {
-        return "Precio del producto inválido"
-    }
-
-    if (!editar_category.value.length) {
-        return "Debe seleccionar una categoría"
-    }
-
-    const productoRepetido = buscarProductoTitle(editar_title.value)
-    if (productoRepetido && productoRepetido.getId() != idProductoEditar) {
-        return "El producto ya se encuentra registrado"
-    }
-
-    return false
+    return string
 }
 
 function mostrarMensaje(mensaje) {
@@ -400,8 +275,6 @@ function cargarCategorias(categorias) {
         optionCategoria.value = categoriaActual.getName()
         optionCategoria.textContent = categoriaActual.getName()
 
-        crear_category.appendChild(optionCategoria.cloneNode(true))
-        editar_category.appendChild(optionCategoria.cloneNode(true))
         filtrar_category.appendChild(optionCategoria.cloneNode(true))
     })
 }
@@ -528,7 +401,7 @@ async function buscarProducto(id) {
 
     console.log("Buscar local: " + (new Date()).getMilliseconds())
 
-    return producto
+    return await producto
 }
 
 function buscarProductoTitle(title) {
@@ -617,6 +490,25 @@ function reducirProductoCarrito(id, unidades = 1) {
     cargarProductosCarrito()
 }
 
+function descartarProductoCarrito(id) {
+    // carritoCargado = carritoCargado.filter(productoActual => productoActual.getId() != id)
+
+    carritoCargado.forEach(productoActual => {
+        if (productoActual.getId() == id) {
+            
+            productoActual.setStock(productoActual.getStock()+productoActual.getEnCarrito())
+            productoActual.setEnCarrito(0)
+        }
+    })
+
+    const carritoString = genCarritoCookieValue()
+
+    añadirCookie("carrito", carritoString)
+
+    cargarTabla(productosCargados)
+    cargarProductosCarrito()
+}
+
 function genCarritoCookieValue() {
     let cookieValue = ""
 
@@ -644,10 +536,18 @@ async function cargarProductosCarrito() {
     mostrarCarrito()
 
     carrito.forEach(producto => {
+        const disponible = productoDisponible(producto.getId())
+
         const tr = document.createElement("tr")
         const td = document.createElement("td")
         const btnAñadir = document.createElement("button")
         const btnReducir = document.createElement("button")
+        const btnDescartar = document.createElement("button")//boton para borrar todas las unidades de un producto
+        const imgDescartar = document.createElement("img")
+
+        if (!disponible) {
+            tr.className = "noDisponible"
+        }
 
         btnAñadir.innerHTML = "<p>+</p>"
         
@@ -663,6 +563,14 @@ async function cargarProductosCarrito() {
             showFloatingInput("Quitar del carrito", "number", (unidades) => reducirProductoCarrito(producto.getId(), unidades))
         }
 
+        imgDescartar.src = "https://cdn-icons-png.freepik.com/512/167/167017.png"
+
+        btnDescartar.className = "btn-descartar"
+        btnDescartar.appendChild(imgDescartar)
+        btnDescartar.onclick = () => showConfirm("¿Seguro desea descartar este producto?", () => {
+            descartarProductoCarrito(producto.getId())
+        })
+
         btnReducir.className = "btnRounded red"
 
         td.innerHTML = producto.getTitle()
@@ -677,10 +585,20 @@ async function cargarProductosCarrito() {
         td.innerHTML = ""
         td.appendChild(btnAñadir)
         td.appendChild(btnReducir)
+        td.appendChild(btnDescartar)
         tr.appendChild(td)
 
         tbodyCarrito.appendChild(tr)
     })
+}
+
+function productoDisponible(id) {
+    productosCargados.forEach(productoActual => {
+        if (productoActual.getId() == id) {
+            return true
+        }
+    })
+    return false
 }
 
 function vaciarProductosCarrito() {
@@ -739,63 +657,8 @@ function ocultarCarrito() {
     carritoView.style.display = "none"
 }
 
-async function crearProducto() {
-    const validar = validarCrear()
-
-    if (validar) {//Si la validación retorna algun error, da una alerta y para
-        mostrarError(validar)
-        return false
-    }
-
-    const categoriaSeleccionada = crear_category.options[crear_category.selectedIndex].value
-    const categoriaClass = new Categoria(categoriaSeleccionada)
-
-    nuevoProducto = new Producto(-1, crear_title.value, crear_description.value, categoriaClass, crear_price.value)
-
-    setLoading()
-
-    fetch("https://dummyjson.com/products/add", {
-        method: "POST",
-        body: nuevoProducto.getURLSearchParams()
-
-    }).then(res => res.json())
-    .then(result => {
-        const categoriaProducto = new Categoria(result.category)
-        const productoAñadido = new Producto(
-            result.id,
-            result.title,
-            result.description,
-            categoriaProducto,
-            result.price
-        )
-
-        añadirProductoTabla(productoAñadido)
-
-        productosCargados.push(productoAñadido)
-
-        mostrarMensaje("Producto añadido correctamente")
-
-    })
-    .finally(() => {
-        crear_title.value = ""
-        crear_description.value = ""
-        crear_price.value = ""
-
-        ocultarCrearProducto()
-        unsetLoading()
-    })
-    
-}
-
 function mostrarCrearProducto() {
-    crearBox.style.display = "flex"
-
-    showDarkedWindow(crearBox.id, ocultarCrearProducto)
-}
-function ocultarCrearProducto() {
-    crearBox.style.display = "none"
-
-    hiddeDarkedWindow(crearBox.id)
+    window.location = "crearProducto.html"
 }
 
 function showFloatingInput(title, inputType, action) {
@@ -852,11 +715,25 @@ function hiddeDarkedWindow(idBox) {
 
 }
 
-function showConfirm(message, action) {
+function showConfirm(message, action) {//Confirm que cuando se acepta ejecuta la función introducida
+    showDarkedWindow(confirmBox.id, ()=>{})
+    confirmBox.className = "show"
 
+    confirmBtnConfirmar.onclick = () => {
+        hiddeConfirm()
+        action()
+    }
+
+    confirmBtnCancelar.onclick = () => hiddeConfirm()
+
+    confirmTitle.innerHTML = message
 }
 function hiddeConfirm() {
-    
+    hiddeDarkedWindow(confirmBox.id)
+    confirmBtnConfirmar.onclick = null
+
+    confirmBox.className = ""
+    confirmTitle.innerHTML = ""
 }
 
 

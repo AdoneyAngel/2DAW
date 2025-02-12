@@ -1,0 +1,496 @@
+* {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    outline: none;
+    margin: 0;
+}
+input, select, textarea {
+    border: 1.5px solid var(--grey);
+}
+:root {
+    --dark: rgb(81, 83, 99);
+    --darker: rgb(35, 36, 43);
+    --grey: rgb(143, 148, 175);
+    --red: rgb(255, 60, 0);
+    --orange: rgb(252, 194, 35);
+    --green: rgb(58, 253, 139);
+    --fade-ani: fade .2s ease-out;
+}
+body {
+    display: grid;
+    grid-template-columns: 30% 1fr;
+    grid-gap: 20px;
+}
+#carritoView {
+    padding: 10px 5px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    transform: translate(10px, 10px);
+    height: calc(100dvh - 40px);
+}
+#carritoView h1 {
+    text-align: center;
+}
+#tablaCarrito td {
+    position: relative;
+}
+#tablaCarrito .btn-descartar {
+    background: transparent;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 50%;
+    right: 0;
+    transform: translate(90%, -50%);
+    opacity: .5;
+}
+#tablaCarrito .btn-descartar img {
+    width: 100%;
+}
+#tiendaView {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-left: 3px solid var(--dark);
+    position: relative;
+}
+#loadingBackground {
+    background: rgba(0, 0, 0, .3);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    backdrop-filter: blur(3px);
+}
+#loadingIcon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#loadingIcon > p {
+    font-size: 23px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, rgb(88, 88, 88) 5%, black, rgb(88, 88, 88));
+    background-clip: text;
+    background-size: 200%;
+    color: transparent;
+    animation: loadingAni 1s linear infinite;
+}
+#notificacion, #notificacion_error {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translate(-50%);
+    background: var(--green);
+    color: rgb(81, 83, 99);
+    padding: 10px;
+    border: 1px solid rgb(81, 83, 99);
+    font-weight: bold;
+    animation: notificacionAni .3s ease-out;
+    animation-delay: 0s;
+    display: none;
+    cursor: pointer;
+    z-index: 15;
+}
+#notificacion_error {
+    background-color: var(--orange);
+}
+#listaBox {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+table {
+    border-collapse: collapse;
+    width: calc(100% - 20px);
+}
+table thead tr th {
+    font-size: 1.2rem;
+    color: var(--grey);
+    padding: 20px 0;
+    position: relative;
+}
+
+table thead tr th::before {
+    content: "";
+    display: block;
+    position: absolute;
+    width: calc(100% - 15px);
+    height: 2px;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--grey);
+}
+table tbody tr {
+    border: 1px solid var(--dark);
+}
+table tr td {
+    padding: 10px;
+    border: 1px dashed var(--grey);
+}
+table button {
+    border: none;
+    border-radius: 2px;
+    width: 100%;
+    padding: 5px 10px;
+    margin: 2px 0;
+    cursor: pointer;
+    display: block;
+}
+table #btnEliminar_tabla {
+    background: var(--red);
+    color: white;
+}
+table #btnEditar_tabla {
+    background: var(--grey);
+    color: white;
+}
+table #btnAñadir_tabla {
+    background: var(--green);
+    color: var(--darker);
+}
+.formulario {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    min-width: 400px;
+    width: 70%;
+    padding: 20px;
+}
+.formulario input, .formulario > textarea, select {
+    margin-bottom: 5px;
+    padding: 10px 15px;
+    resize: none;
+    font-size: 1rem;
+    background: var(--grey);
+    color: white;
+    border-radius: 5px;
+    /* border: 2px solid var(--grey); */
+    border: none;
+}
+.formulario input::placeholder {
+    color: #dfdfdf;
+}
+.formulario > label {
+    margin-top: 15px;
+    bottom: 5px;
+    margin-left: 20px;
+    position: relative;
+    color: grey;
+}
+.formulario button {
+    padding: 10px 0;
+    margin: 10px 0;
+    margin-top: 25px;
+    cursor: pointer;
+    display: block;
+    border-radius: 5px;
+    border: 1px solid var(--grey);
+}
+.formulario .price_range {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.formulario .price_range input {
+    margin: 0 5px;
+    margin-bottom: 5px;
+    padding: 5px 15px;
+    resize: none;
+    font-size: 1rem;
+}
+.floatingBox {
+    background: var(--dark);
+    padding-top: 30px;
+    padding-bottom: 40px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    border-radius: 10px;
+    opacity: 1;
+    animation: var(--fade-ani);
+}
+.floatingBox input, .floatingBox textarea, .floatingBox select {
+    margin-bottom: 5px;
+    resize: none;
+    font-size: 1rem;
+    background: var(--darker);
+    border-color: var(--darker);
+    color: white;
+}
+.floatingBox input::placeholder, .floatingBox textarea::placeholder {
+    color: #dfdfdf;
+}
+.floatingBox label {
+    color: #d3d3d3;
+}
+.floatingBox button {
+    background: var(--grey);
+    margin: 10px 0;
+    margin-top: 25px;
+}
+.floatingBox option {
+    background: var(--darker);
+}
+h1 {
+    font-weight: 100;
+    margin-bottom: 15px;
+}
+#makeErrorBox {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--dark);
+    opacity: .8;
+    border-radius: 5px;
+    color: white;
+    font-size: 1.2rem;
+    overflow: hidden;
+    cursor: pointer;
+    padding: 10px;
+    width: 50px;
+    height: 25px;
+    border: 3px solid var(--red);
+}
+#makeErrorBox button {
+    background: transparent;
+    border: none;
+    font-size: 1rem;
+    color: white;
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: bold;
+    cursor: pointer;
+}
+#makeErrorBox img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    z-index: -1;
+    filter: brightness(.8);
+}
+#btnUnsetFiltrando {
+    margin-left: auto;
+    border: none;
+    background: transparent;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--grey);
+    position: absolute;
+    top: 0px;
+    right: 25px;
+    padding: 0;
+    display: none;
+}
+#filtroBox{
+    transition: .15s ease-in-out;
+    border-radius: 10px;
+    border: 0px solid var(--grey);
+    position: relative;
+    box-shadow: 0px 0px 0px 0px var(--grey);
+}
+#filtroBox.filtrando {
+    border: 5px solid var(--grey);
+    box-shadow: 0px 0px 15px -5px var(--grey);
+}
+#filtroBox.filtrando #btnUnsetFiltrando {
+    display: block;
+}
+#darkBackground {
+    width: 100%;
+    height: 100dvh;
+    background: rgba(0, 0, 0, 0.301);
+    backdrop-filter: blur(3px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9;
+    transition: .2s;
+    display: none;
+    opacity: 1;
+    animation: darkBackgroundAni .2s ease-out;
+}
+#btnCrear {
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    color: black;
+    box-shadow: 0px 0px 5px var(--green);
+    font-weight: bold;
+    background: var(--green);
+    cursor: pointer;
+    position: sticky;
+    margin-right: calc(100% - 40px);
+    transform: translateX(50%);
+    top: 20px;
+    left: 20px;
+    width: max-content;
+    z-index: 2;
+}
+.btnRounded {
+    padding: 2px;
+    border-radius: 100%;
+    width: 30px;
+    height: 30px;
+    margin: 5px auto;
+    font-weight: bold;
+    font-size: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.btnRounded p {
+    height: 100%;
+}
+.btnRounded.red {
+    background: var(--red);
+    color: white;
+}
+.btnRounded.green {
+    background: var(--green);
+}
+#floatingInput {
+    display: none;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--dark);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+#floatingInput h2 {
+    margin-bottom: 20px;
+}
+#floatingInput input {
+    background: var(--grey);
+    padding: 5px 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 10px;
+}
+#floatingInput button {
+    background: white;
+    border: none;
+    border-radius: 5px;
+    padding: 3px 10px;
+    cursor: pointer;
+    margin-left: auto;
+    display: block;
+}
+#floatingInput input::placeholder {
+    color: var(--dark);
+}
+#btn_volver {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 10px;
+    border: 1px solid var(--dark);
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: var(--orange);
+}
+#confirm {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark);
+    padding: 20px;
+    border-radius: 10px;
+    display: none;
+    animation: var(--fade-ani);
+}
+#confirm.show {
+    display: block;
+}
+#confirm h2 {
+    margin-bottom: 20px;
+    color: white;
+}
+#confirm #confirm-btn-box {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+#confirm button {
+    display: block;
+    border: 1px solid var(--darker);
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+#confirm #confirm-confirmar {
+    background-color: var(--green);
+}
+#confirm #confirm-cancelar {
+    background-color: var(--orange);
+}
+#main-title {
+    font-size: 3rem;
+    display: block;
+    text-align: center;
+}
+
+@keyframes notificacionAni {
+    0% {
+        transform: translate(-50%, -150%);
+    }
+    100% {
+        transform: translate(-50%, 0%);
+    }
+}
+@keyframes loadingAni{
+    0% {
+        background-position: 100%;
+    }
+    100% {
+        background-position: -100%;
+    }
+}
+@keyframes darkBackgroundAni {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+@keyframes fade {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}

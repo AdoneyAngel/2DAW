@@ -1,0 +1,19 @@
+Pasos para la parte de docker con proFTPD:
+
+1. Descargar la imagen de docker machines/proftpd: sudo docker pull hauptmedia/proftpd
+
+2. Ejecutamos un contenedor basado en la imagen machines/proftpd: sudo docker run -d -p 2121:21 -e FTP_USERNAME=nombreUsuario -e FTP_PASSWORD=1234 -v /etc/proftpd:/home/nombreusuario hauptmedia/proftpd
+
+3. Mostramos los contenedores: sudo docker ps -a
+
+4. Comprobamos que funciona el servidor FTP: sudo docker exec -it "docker guid" /bin/bash
+
+5. Probamos la conexión desde FileZilla al servidor proFtpd del contenedor.
+
+
+
+
+
+
+
+	

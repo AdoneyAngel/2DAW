@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar producto</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body style="display: block;">
+    <h1 id="main-title">Editar un producto</h1>
+    <div id="editarBox" class="floatingBox">
+        <div class="formulario">
+            <h1>Editar producto</h1>
+            <label>Title</label>
+            <input type="text" placeholder="Título" id="editar_title" name="title">
+    
+            <label>Description</label>
+            <textarea name="description" id="editar_description" placeholder="Descripción"></textarea>
+    
+            <label>Category</label>
+            <select id="editar_category">
+                <option value="">Sin seleccionar</option>
+            </select>
+    
+            <label>Price</label>
+            <input type="number" id="editar_price" placeholder="Precio" min="1">
+    
+            <button id="btn_editar">Editar producto</button>
+        </div>
+    </div>
+    
+    <div id="notificacion">Mensaje a mostrar</div>
+    <div id="notificacion_error" class="alert">Mensaje a mostrar</div>
+
+    <div id="btn_volver" onclick="volver()">
+        <p>Volver</p>
+    </div>
+
+    <script src="Categoria.js"></script>
+    <script src="Producto.js"></script>
+    <script src="editarProducto.js"></script>
+</body>
+</html>
